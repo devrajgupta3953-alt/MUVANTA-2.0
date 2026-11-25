@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Muvanta</string>
+    <string name="brand_wordmark">MUVANTA</string>
+    <string name="brand_tagline">Your World of Stories</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_discover">Discover</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_collections">Collections</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="category_all">All</string>
+    <string name="category_movies">Movies</string>
+    <string name="category_series">Series</string>
+    <string name="category_anime">Anime</string>
+    <string name="category_documentaries">Documentaries</string>
+    <string name="search_placeholder">Search title, year, or #rank (e.g. Interstellar, 1994, #12)</string>
+    <string name="action_pick_unwatched">Pick Unwatched</string>
+    <string name="action_filters">Filters</string>
+    <string name="action_reset_filters">Reset all filters</string>
+    <string name="action_view_statistics">View statistics</string>
+    <string name="action_back">Back</string>
+    <string name="mode_grid">Grid</string>
+    <string name="mode_shelf">Shelf</string>
+    <string name="mode_orb">3D Orb</string>
+    <string name="footer_attribution">Metadata via Wikipedia, TVmaze, and iTunes Search API</string>
+    <string name="cd_brand_logo">Muvanta cinema archive emblem</string>
+    <string name="cd_search">Search catalog</string>
+    <string name="cd_clear_search">Clear search query</string>
+    <string name="cd_toggle_watched">Toggle watched status</string>
+    <string name="cd_navigate_back">Navigate back</string>
+    <string name="cd_add_collection">Create custom collection</string>
+</resources>

@@ -1,0 +1,1007 @@
+# **MUVANTA 2.0 — Complete Master Feature List**
+
+**MUVANTA is a global entertainment discovery, tracking, rating, recommendation, analytics and social platform for movies, television series, anime and documentaries.**
+
+This is the consolidated feature catalogue for our project. It combines our existing ZIP functionality, previously discussed requirements, and the five-phase product vision.
+
+I have separated core features from advanced and future features so that we don't confuse planned functionality with features that have already been built.
+
+# **1. Entertainment Discovery System**
+
+[Movie Streaming Platform — UI Exploration by RR on Dribbble](https://images.openai.com/static-rsc-4/tF5K5Lfrg3yVZZXyBgw7V_PmUHSGe5tmxunnHNJX6V_Za6ZwG9BEqE1dzEZskvzXQrOVLp3n3uPs0lGmzahycfN5eC_-GfjyHgygeHWTFXq_Sxr2LP-7O83Qz8oUyHE9pCSTGIAeHEXKNaDpLHk5PbRvKEBY56Rrnot6nVEoRfM?purpose=inline)
+
+[GitHub - transitive-bullshit/next-movie: Pick your next movie using Next.js 13 · GitHub](https://images.openai.com/static-rsc-4/U1yAz2lyodfoK6R1LEVgprO8LSPAMS2tv7tpcclcrjipCQu2Bhh_QVNrK8KgLJpXvyndjnU-RG7fpK2enUgehZ2KLE2a4oFvLvQ8w0Yj0N8RwUTyW03WfQxI78zqhFaZZ0zI6OuLu6GtJj3a8h1LNCAFlaFZzdooTPSoqcbeOkA?purpose=inline)
+
+[HBO GO | Codigo SG](https://images.openai.com/static-rsc-4/CMXY11yC3McKbyUeUeA6XFPoRrC6vrktm6az9wiECf_Q5KgNgIZpRjnGWOnBicy76KCawtKzTafrs7S7EpjwjxKdUwRJEmC4a1Mc39LwgiMLvmXBgCAP_zzH-rgj1UUqL2QG7NodGEvMJGn1_PhvFVs3E-rVbgSDZ-p2Z8HPCI8?purpose=inline)
+
+10
+
+The main purpose is to help users discover what to watch.
+
+| ID  | Feature                | Description                                                   |
+| --- | ---------------------- | ------------------------------------------------------------- |
+| D01 | Global Movie Discovery | Discover movies from different countries and industries.      |
+| D02 | Series Discovery       | Discover television and web series.                           |
+| D03 | Anime Discovery        | Discover anime movies and series.                             |
+| D04 | Documentary Discovery  | Discover documentaries.                                       |
+| D05 | Featured Content       | Highlight selected movies and series.                         |
+| D06 | Trending Content       | Display currently trending titles using reliable data.        |
+| D07 | Popular Content        | Explore widely watched titles.                                |
+| D08 | Top-Rated Content      | Explore highly rated content with transparent rating sources. |
+| D09 | Upcoming Releases      | Discover upcoming movies and series.                          |
+| D10 | Recently Released      | Explore recently released titles.                             |
+| D11 | Hidden Gems            | Discover lesser-known quality content.                        |
+| D12 | Editorial Collections  | Curated lists created by MUVANTA editors.                     |
+| D13 | Similar Content        | Find movies and series similar to a selected title.           |
+| D14 | Random Movie Picker    | Select something randomly when users cannot decide.           |
+| D15 | Discovery by Era       | Explore content by decade and period.                         |
+| D16 | Discovery by Country   | Explore cinema from different countries.                      |
+| D17 | Discovery by Language  | Explore content by language.                                  |
+| D18 | Discovery by Industry  | Explore different film industries.                            |
+
+# **2. Advanced Search and Filtering System**
+
+[Enhanced Search Filter Options: Genre Inclusion/Exclusion, Search Result Sorting + Copy Results to List - Feature Requests - Trakt Forums](https://images.openai.com/static-rsc-4/yMfB6icf32yIts4KHmCNqpxilZoFTn5ywDYKqMpFNvQJgQqvGBmFWAYOdIhwh3pcf3hE1X4DtvRe6osgX4DL1PXCSps_yNFbX0Wy9rTBTHe3R2gZgFKWRF5IMu_8ya0DEZriCPgRUSN1BBgVvS93fg3UMtgCpzaWLCeOND9dV8Y?purpose=inline)
+
+[forums.trakt.tv](https://forums.trakt.tv/t/enhanced-search-filter-options-genre-inclusion-exclusion-search-result-sorting-copy-results-to-list/23392?utm_source=chatgpt.com)
+
+Users should be able to find exactly the entertainment they want.
+
+### **2.1 Search features**
+
+- Global search.
+- Movie search.
+- Series search.
+- Anime search.
+- Documentary search.
+- Search by title.
+- Search by actor.
+- Search by director.
+- Search by genre.
+- Search by country.
+- Search by language.
+- Search suggestions.
+- Search history.
+- Recent searches.
+- Typo-tolerant search.
+- Advanced search.
+
+### **2.2 Our 10 discovery filter categories**
+
+An important design decision: **Genres and emotions must be separate.** Drama is a genre; Emotional is a mood.
+
+| No. | Filter category | Examples                                       |
+| --- | --------------- | ---------------------------------------------- |
+| 1   | Genre           | Drama, Comedy, Thriller, Horror                |
+| 2   | Emotion / Mood  | Feel-Good, Emotional, Heartbreaking, Uplifting |
+| 3   | Language        | English, Hindi, Korean, Japanese               |
+| 4   | Country         | India, Japan, South Korea, France              |
+| 5   | Release Period  | 1970s, 1980s, 1990s, 2000s                     |
+| 6   | Content Type    | Movie, Series, Anime, Documentary              |
+| 7   | Rating          | Rating ranges and rating sources               |
+| 8   | Runtime         | Short, Medium, Long                            |
+| 9   | Theme / Subject | Space, Friendship, Revenge, Family             |
+| 10  | Availability    | Verified streaming and rental options          |
+
+Additional filtering:
+
+- Watched / Unwatched.
+- Completed / Watching / Planned.
+- Release year.
+- Director.
+- Cast.
+- Age classification.
+- Sort by popularity.
+- Sort by release date.
+- Sort by rating.
+- Sort by runtime.
+
+Users should be able to combine multiple filters.
+
+For example:
+
+"Find emotional Japanese animated movies released after 2010."
+
+# **3. Movie and Series Detail Pages**
+
+[Plex merges content from any service with new Discover and Universal Watchlist \[U: Kid account concerns\] - 9to5Mac](https://images.openai.com/static-rsc-4/-70fpmfaXHKjCguq-jBz4I5dWWHeI68wE_H6txgcx_S6J7KCNnXDztayTuzC1CzZxoSB52pDS5ieqiS94DZaDLeG0_VPcYpeRJIJHKxTtz_cAfen3SEPudaU3ghtxGYZh8qdzuSO6N_ASj1U8yT0GaX4crmU3ER1tlim-qLsaMM?purpose=inline)
+
+[The IPTVX Story with Matteo Gobbi | by Federico Francioni | design-ERS](https://images.openai.com/static-rsc-4/tZrwG8r6bNjAh34BKWRDvZLaFRpkYLZw1yfpgWo4Jp-Ms4PCBy8gq9uY_SP9VsGCZKMtSK2CSsUQMWgpXz9CI94zzlZWtzTv4d7HWqsVkGg3FsTloaDYRYdNZnLb8zxRZQiC-dkt8Ugd4TuFo9gvEec9LBdA5dge6Z9ZWDGFBOw?purpose=inline)
+
+[Streaming Web App UI Design :: Behance](https://images.openai.com/static-rsc-4/FvVGhOldui8MwPZViVWWR6Vws6ZXNC3hb628Iv2pEK25xWuN636z5_YdmJDuirGnHdDvtw_GYmVvbZiEbCNNt5sojr6VBaICi9izbALVhAaTByNh1clRqgvTlQ7Vujd3-QXutxrXucur5oWWQJXHls8Q3Nr3W8MEXPpOy8XyCt8?purpose=inline)
+
+12
+
+Every title should have a dedicated detail page.
+
+### **Movie details**
+
+- Movie poster.
+- Backdrop image.
+- Movie title.
+- Original title.
+- Release date.
+- Release year.
+- Runtime.
+- Synopsis.
+- Genres.
+- Languages.
+- Country of origin.
+- Director.
+- Writers.
+- Cast.
+- Production companies.
+- Age classification.
+- Official trailer.
+- Related movies.
+- Similar movies.
+- User ratings.
+- Reviews.
+- Streaming availability where verified.
+
+### **Series details**
+
+Everything relevant to movies, plus:
+
+- Number of seasons.
+- Number of episodes.
+- Season information.
+- Episode titles.
+- Episode descriptions.
+- Episode release dates.
+- Episode runtimes.
+- Season posters.
+- Series status.
+- Series completion information.
+
+### **Additional content information**
+
+- Franchises.
+- Movie collections and cinematic universes.
+- Sequels and prequels.
+- Remakes.
+- Spin-offs.
+- Adaptations.
+- Related titles.
+
+# **4. Personal Entertainment Library**
+
+[CineMatch - Find What to Watch Next](https://images.openai.com/static-rsc-4/sbi_BFWcWE0BrP-EMi_pHUgf-n4KGO614dspSLPfO5j4-uHLEvl2BuhQV78THoRPuUHxqRxAWELRGaUfggbfkxzJQ7f7XaEVmTENn7oU3shFn2ecBJMliqNMn3Qym9RRlqDT0Bd80UCQaaJrPx-m6EGvgwPOmvqwBa3ogXDjviI?purpose=inline)
+
+[cinematchapp.net](https://cinematchapp.net/?utm_source=chatgpt.com)
+
+This is one of our most important features.
+
+Every registered user gets an independent entertainment library.
+
+### **4.1 Viewing status**
+
+- Plan to Watch.
+- Watching.
+- Completed.
+- On Hold.
+- Dropped.
+- Rewatching.
+
+### **4.2 Library management**
+
+- Add movies to library.
+- Add series to library.
+- Remove titles.
+- Update viewing status.
+- Search personal library.
+- Filter personal library.
+- Sort personal library.
+- Grid view.
+- List view.
+- Collection view.
+- Custom ordering.
+- Bulk editing.
+- Bulk status changes.
+- Duplicate prevention.
+
+### **4.3 Viewing history**
+
+- Record viewing date.
+- Record completion date.
+- Record start date.
+- View historical activity.
+- Rewatch history.
+- Previous ratings.
+- Viewing timeline.
+- Recently watched titles.
+
+### **4.4 Personal organisation**
+
+- Personal favourites.
+- Custom labels.
+- Private notes.
+- Personal tags.
+- Custom collections.
+- Personal ranking lists.
+- Watch priorities.
+
+# **5. Movie Tracking System**
+
+Users should have complete control over their movie-watching records.
+
+Features:
+
+1. Mark as watched.
+2. Mark as unwatched.
+3. Add to watchlist.
+4. Remove from watchlist.
+5. Record viewing date.
+6. Record completion date.
+7. Rate movies.
+8. Write reviews.
+9. Add private notes.
+10. Record rewatches.
+11. View viewing history.
+12. Track favourite movies.
+13. Add movies to collections.
+14. Edit previous records.
+15. Delete personal records.
+16. Track multiple viewings of the same movie.
+
+**Important:** Rewatching a movie should not erase its previous viewing history.
+
+# **6. Series, Season and Episode Tracking**
+
+This needs its own dedicated system.
+
+- Add series to library.
+- Track watching status.
+- Track individual seasons.
+- Track individual episodes.
+- Mark episodes watched.
+- Mark episodes unwatched.
+- Record episode viewing dates.
+- Track last watched episode.
+- Calculate episode completion percentage.
+- Calculate season progress.
+- Calculate overall series progress.
+- Mark seasons completed.
+- Mark entire series completed.
+- Track paused series.
+- Track dropped series.
+- Track rewatches.
+- Resume from last watched episode.
+- Maintain series viewing history.
+
+# **7. Personal Rating and Review System**
+
+[Movie Website by Hani Jalili on Dribbble](https://images.openai.com/static-rsc-4/ZFDyOS7jtjFfoKmMyRR56Yi9_uSmrMcbqjAQzHLephLNGcXigR3uAcqRE9iuS5Bu7z78TG7BVGp00JhNidn8BMIixSh5Ec_wqeuIhkuXC6qugIqgoM-DL8BJkSItlqakH8FGWFRjrVPheav_o1zG1XtfrHwWkC0gpfWk15xgVRI?purpose=inline)
+
+[dribbble.com](https://dribbble.com/shots/24565839-Movie-Website?utm_source=chatgpt.com)
+
+### **Personal ratings**
+
+- 0.5–5-star rating system.
+- Half-star increments.
+- Edit rating.
+- Remove rating.
+- Personal rating history.
+- Rating distribution.
+- Average personal rating.
+
+### **Reviews**
+
+- Write movie reviews.
+- Write series reviews.
+- Edit reviews.
+- Delete reviews.
+- Publish reviews.
+- Keep reviews private.
+- Like reviews.
+- Comment on reviews.
+- Report inappropriate reviews.
+- Sort reviews.
+- Browse reviews by users.
+
+### **Rating transparency**
+
+We should distinguish:
+
+- Personal user rating.
+- MUVANTA community rating.
+- External rating sources.
+- Professional critic ratings, where properly licensed.
+
+Never combine these into one misleading number.
+
+# **8. Custom Collections and Watchlists**
+
+[Filmee | Mobile app for your film list | UI/UX (10) | Images :: Behance](https://images.openai.com/static-rsc-4/IeBpgR78fhXltw7EMPbR9sa8YtiX3HV-47iwBx1lNziKAF7s8drxMyBN2nynoNYb7K5LPsnsRmRg-umVqhR1ronkhKufvrS6-WlxNN5zDvUZOcYQ8tf2A23HkpErhLLT6WTZSLD1xDfjuk7p1rIn_2ukFmNbni5zKWmJ6-mzayY?purpose=inline)
+
+[CineTrak: películas y series - Descargar APK para Android | Aptoide](https://images.openai.com/static-rsc-4/H4it-q3bxtMTN2TabqG9T7XGU5ZHHak6iNn1KZqNfVMNKOBEhEtETluQ7wM8n8vQ8BvCwAthopqMnXlZ54-HlHsyfqu8u4lpLDFhS96ctNlipz3NJ9eJMs4qa4hSnd3BM23uvMp5EjkbIobbY24An0Grhw4t7QljKnGLOh6bsdk?purpose=inline)
+
+[This Week in Self-Hosted (28 March 2025)](https://images.openai.com/static-rsc-4/9GbCiSJDsykOIk_NKcZPzY95m_6QAcD4AQD8soJiXpRWgWvbPr7R3x3V5zZGwXMqFQQnyZhlH4mn1CmvhDSNCNobTrDaIvMKMBznNX2IwjOiAqayPuVzS6BFh_dLyEeb7siGOxdYFxA67kZ36DfgY5dSctMps76OS5Y_98uBpfc?purpose=inline)
+
+10
+
+Users can create their own movie collections.
+
+### **Collection management**
+
+- Create collections.
+- Edit collection names.
+- Add descriptions.
+- Add cover images.
+- Add movies.
+- Add series.
+- Remove titles.
+- Rearrange titles.
+- Duplicate collections.
+- Delete collections.
+- Search collections.
+- Sort collections.
+
+### **Collection privacy**
+
+- Private collections.
+- Public collections.
+- Shareable collections.
+- Unlisted collections.
+
+### **Examples**
+
+- My All-Time Favourite Movies.
+- Best Movies of All Time.
+- Movies That Changed My Life.
+- Best Psychological Thrillers.
+- Best Indian Cinema.
+- Movies to Watch With Friends.
+- My Lifetime Watchlist.
+- Best Anime Series.
+- Hidden Gems.
+- Movies Worth Rewatching.
+
+# **9. Personal Entertainment Statistics and Analytics**
+
+[‎Welcome to Letterboxd • Letterboxd](https://images.openai.com/static-rsc-4/zqZifJT-vn8xvK65oC86QlG6QdvdRLoEoHfIJ7wSWDWbBPi3tjATIxuABi9_HKru2sylNrRfDny090c6xKlQrWkFrCQtDOY5gM3mmPtv3HIzLUKgbTMgDwORsX_4GXWqsIrNAkvKLenHQI8BwR_6iJRHXWH7HeXb7EEitPHPJME?purpose=inline)
+
+[letterboxd.com](https://letterboxd.com/welcome/?utm_source=chatgpt.com)
+
+MUVANTA should turn a user's viewing history into useful information.
+
+### **General statistics**
+
+- Total movies watched.
+- Total series completed.
+- Total episodes watched.
+- Total documentaries watched.
+- Total anime watched.
+- Total watch time.
+- Average movie rating.
+- Average series rating.
+- Total reviews written.
+- Total collections created.
+
+### **Genre analytics**
+
+- Most-watched genres.
+- Least-watched genres.
+- Highest-rated genres.
+- Genre distribution.
+- Genre preferences over time.
+
+### **Other analytics**
+
+- Favourite languages.
+- Favourite countries.
+- Favourite directors.
+- Favourite actors.
+- Favourite decades.
+- Most-watched release periods.
+- Shortest and longest movies watched.
+- Most-watched months.
+- Viewing frequency.
+
+### **Time-based statistics**
+
+- Daily viewing activity.
+- Weekly activity.
+- Monthly reports.
+- Yearly reports.
+- Lifetime statistics.
+- Viewing streaks.
+- Annual entertainment summaries.
+
+### **Rating analytics**
+
+- Personal rating distribution.
+- Highest-rated movies.
+- Lowest-rated movies.
+- Average rating by genre.
+- Average rating by country.
+- Rating trends over time.
+
+### **Advanced analytics**
+
+- Taste evolution.
+- Viewing diversity.
+- Genre exploration.
+- Country exploration.
+- Mainstream versus lesser-known cinema.
+- Personal taste profile.
+- Comparison between viewing habits and ratings.
+
+All analytics must use genuine user data.
+
+# **10. Personalised Recommendation Engine**
+
+[CinAI – AI Streaming Mobile App by Zinat Farahani on Dribbble](https://images.openai.com/static-rsc-4/KXGVZc6evvBXhcxWSojpoaMKfSGjPIp1ONUlFNazz-l2Hu2qxNau_VOb4MmCmCpDg4tkXawZCoAgeTI_01k-0ag7Xg-3MUx639f3N9KI4p8_XSvr9J3eZPfFEDhHH5jfnF-lGFvrVjL81oDXf_CajLsG_gZ3ENX4HXV9z3ZUXmA?purpose=inline)
+
+[dribbble.com](https://dribbble.com/shots/26250521-CinAI-AI-Streaming-Mobile-App?utm_source=chatgpt.com)
+
+This is one of the most important potential differentiators of MUVANTA.
+
+The application should learn what users enjoy and recommend relevant entertainment.
+
+### **Recommendation features**
+
+- Personalised movie recommendations.
+- Personalised series recommendations.
+- Anime recommendations.
+- Documentary recommendations.
+- Similar movie recommendations.
+- Similar series recommendations.
+- Genre-based recommendations.
+- Mood-based recommendations.
+- Language-based recommendations.
+- Country-based recommendations.
+- Hidden-gem recommendations.
+- Recommendations based on ratings.
+- Recommendations based on viewing history.
+- Recommendations based on collections.
+- Recommendations based on user preferences.
+- Recommendations based on similar users.
+- Recommendations based on explicit feedback.
+
+### **Advanced recommendation capabilities**
+
+- Content-based filtering.
+- Collaborative filtering.
+- Hybrid recommendation engine.
+- Candidate generation.
+- Ranking system.
+- Diversity-aware recommendations.
+- Taste profile generation.
+- Feedback learning.
+- Negative preference signals.
+- Recommendation explanations.
+- Recommendation quality measurement.
+
+### **Example**
+
+A user rates these movies highly:
+
+- Interstellar.
+- Arrival.
+- Inception.
+- The Prestige.
+
+MUVANTA learns their preferences and recommends relevant titles.
+
+It should also explain why a movie was recommended.
+
+**Our objective:** Help people discover excellent entertainment, not simply show them the most popular movies.
+
+# **11. Mood-Based and Emotion-Based Discovery**
+
+This deserves special attention because we previously discussed adding 5–10 categories to our filters.
+
+Users should be able to find entertainment according to how they feel.
+
+### **Possible mood categories**
+
+| Mood              | What users want                      |
+| ----------------- | ------------------------------------ |
+| Feel-Good         | Something that makes them happy      |
+| Emotional         | Deep emotional experiences           |
+| Heartbreaking     | Powerful, sad stories                |
+| Motivational      | Inspiring entertainment              |
+| Mind-Bending      | Complex stories and twists           |
+| Relaxing          | Calm and peaceful entertainment      |
+| Dark              | Dark and disturbing stories          |
+| Romantic          | Love and relationships               |
+| Thrilling         | Suspense and excitement              |
+| Thought-Provoking | Philosophical and meaningful stories |
+
+Additional capabilities:
+
+- Multiple mood selection.
+- Mood combinations.
+- Mood-based recommendations.
+- Mood-based collections.
+- Mood discovery homepage.
+- Emotion-based search.
+
+# **12. User Accounts and Profiles**
+
+[Slow Motion (@Slow00Motion) on X](https://images.openai.com/static-rsc-4/n4bOi9F_AmKUs-ldGqa5wM5AdoYWX8UTEFVqPxu7kWfJTNdPdSCpVurUCFiPeUVADI9E-GtqEV9g2mxN8kZXDiNWG87ut6GXZYcH0LUwi64zJ16CAGsTzdJlpgZT7xAYOVbH6bjxpvi708Qgz1aSN2VNlHQ6p_wfnzT4puwkFck?purpose=inline)
+
+[x.com](https://x.com/Slow00Motion?utm_source=chatgpt.com)
+
+### **Account features**
+
+- Sign up.
+- Login.
+- Logout.
+- Email verification.
+- Password recovery.
+- Account settings.
+- Profile editing.
+- Profile picture.
+- Username.
+- Biography.
+- Account deletion.
+- Data export.
+
+### **Profile features**
+
+- Personal profile.
+- Public profile.
+- Private profile.
+- Favourite movies.
+- Favourite series.
+- Public reviews.
+- Public collections.
+- Personal statistics.
+- Entertainment preferences.
+- Viewing history visibility.
+- Profile customisation.
+
+### **Privacy controls**
+
+Users should control:
+
+- Who can see their profile.
+- Who can see their reviews.
+- Who can see their collections.
+- Who can see their viewing activity.
+- Who can interact with them.
+
+Private notes and private library records must remain protected.
+
+# **13. Social and Community Features**
+
+[Reelmark ⎻ Movie Tracking App by Alfikri Djati on Dribbble](https://images.openai.com/static-rsc-4/o_B6ADGpZlbStzL_pwXr1d7T6wcRMZpX3TQOu8UI5btJYljYW2NsCgErCjatop_5_n3_EvT7zPxxBmhVgZwYigNaDgmHKUbXqIvgx8KiRav__rtFrtNcKAgDBEbHxzIcAa8XxKGtu6OahID-KytUBk6ciByxVjjrfTWuG-9y6Is?purpose=inline)
+
+[Letterboxd on steroids — a ux redesign case study | by Ankush | Bootcamp | Medium](https://images.openai.com/static-rsc-4/xMB3_RtAetBkE6vBRypZi_M8QlhIuH4dp-pHEsqfeqs7dEwxbINt2vvEkNYC8Y0YHzrJ5g6Zq6drfjL6JRV0kXMBelSw8trCjGfZ4qX_Fmu54TQWQDNO7ZV1Gtrgx3bU01uT6CRszItiHKchBCvrhBryLYZS_fP51OUxUCZ_j0A?purpose=inline)
+
+[Streaming App designs, themes, templates and downloadable graphic elements on Dribbble](https://images.openai.com/static-rsc-4/Aq5JVNoSSSPT6KuVmYg42ocHMdgI-osZ8Gr-pHncYBUdS_5mjtvSi6t_IUbpocZLS6Bm_GVnNjErkPM_DWedY52_VVagHyDUbVoccB3Zje6ObON0j6IQF6gtOHjKJeex1DE8nMpyevr6qM8ksW-aErQJ1vQ_2Lz5oo0uNiKDhZE?purpose=inline)
+
+10
+
+### **Social connections**
+
+- Follow users.
+- Unfollow users.
+- Followers list.
+- Following list.
+- Discover users.
+- Find users with similar tastes.
+- Suggested users.
+
+### **Social activities**
+
+- Activity feed.
+- Share movie activity.
+- Share reviews.
+- Share collections.
+- Share recommendations.
+- Like reviews.
+- Comment on reviews.
+- Reply to comments.
+- Save interesting reviews.
+
+### **Community discovery**
+
+- Popular reviews.
+- Featured reviewers.
+- Popular collections.
+- Community favourites.
+- Trending discussions.
+- Community recommendations.
+
+### **Community protection**
+
+- Report users.
+- Block users.
+- Report reviews.
+- Report comments.
+- Spam detection.
+- Moderation tools.
+- Community guidelines.
+
+These are planned social capabilities, not features we should pretend are already operational.
+
+# **14. Streaming and Watch Availability**
+
+Users should be able to find where entertainment is legally available.
+
+Features:
+
+- Streaming platform information.
+- Subscription availability.
+- Rental availability.
+- Purchase availability.
+- Country-specific availability.
+- Streaming provider filters.
+- Watch-provider links.
+- Availability updates.
+- Last-verified date.
+
+For example, a user finds a movie and wants to know whether it is available on Netflix, Prime Video or another platform in India.
+
+MUVANTA should display verified information rather than invent availability.
+
+# **15. Data Import, Export and Backup**
+
+This is especially important because users may already have large movie lists.
+
+### **Import**
+
+- Import existing movie lists.
+- Import existing series lists.
+- Import from text files.
+- Import from CSV.
+- Import from JSON.
+- Map imported titles to catalogue records.
+- Detect duplicates.
+- Preview before importing.
+- Resolve unmatched titles.
+- Preserve existing ratings and viewing dates where supported.
+- Import from third-party services when their APIs and terms permit.
+
+### **Export**
+
+- Export movie library.
+- Export series library.
+- Export watchlist.
+- Export viewing history.
+- Export ratings.
+- Export reviews.
+- Export collections.
+- Export statistics.
+- JSON export.
+- CSV export.
+
+### **Backup**
+
+- Download personal backup.
+- Restore from backup.
+- Validate imported files.
+- Avoid accidental duplicate records.
+- Protect against accidental data loss.
+
+# **16. Offline and Synchronisation Features**
+
+Users should not lose their entertainment records when the internet stops working.
+
+Features:
+
+- Offline access to cached personal library.
+- Offline viewing-status changes.
+- Offline ratings and notes.
+- Local pending-change queue.
+- Automatic synchronisation when online.
+- Conflict resolution.
+- Multi-device synchronisation.
+- Sync status indicator.
+- Error recovery.
+- Duplicate prevention.
+
+Important distinction: offline tracking means recording entertainment activity without internet access. It does not mean downloading copyrighted movies for offline playback.
+
+# **17. Notifications and Reminders**
+
+- New episode reminders.
+- Upcoming release notifications.
+- Watchlist updates.
+- New follower notifications.
+- Review likes.
+- New comments.
+- Collection interactions.
+- Recommendation notifications.
+- Optional viewing reminders.
+- Notification preferences.
+- Email notifications.
+- In-app notifications.
+- Push notifications where supported.
+
+Notifications must be configurable, not forced on users.
+
+# **18. Homepage and Featured Content Management**
+
+MUVANTA needs a dynamic homepage rather than the same fixed poster collection for everyone.
+
+### **Homepage sections**
+
+- Featured movies.
+- Featured series.
+- Trending now.
+- Popular movies.
+- Popular series.
+- New releases.
+- Upcoming releases.
+- Hidden gems.
+- Editor's picks.
+- Mood-based discovery.
+- Genre-based discovery.
+- Country-based discovery.
+- Personalised recommendations.
+- Continue watching.
+- Recently watched.
+- Your watchlist.
+- Popular community collections.
+
+### **Homepage personalisation**
+
+For logged-in users:
+
+- Adapt content to their preferences.
+- Show relevant recommendations.
+- Continue their viewing journey.
+- Highlight unfinished series.
+- Show new discoveries based on their taste.
+
+### **Admin-controlled features**
+
+- Create homepage sections.
+- Change featured titles.
+- Arrange sections.
+- Publish editorial collections.
+- Schedule featured content.
+- Remove outdated content.
+
+# **19. Admin Panel and Platform Management**
+
+[12 Full-Stack Project Ideas (With Designs) for Your Developer Portfolio | by Victor Onyedikachi | Mar, 2026 | Medium](https://images.openai.com/static-rsc-4/tlbeT-711SWE7yc2RqNByda16am2GWLr8WasEi9xue5uNnZwBkfEUZalM2HNJg7Ii_cfVvLEN66ognK9k9teYFI6s_XtfVwS0UC5rteq7_S9aQtG3ldRfDVz2j8fZCqhlAJ4qi2MP7nOsj3Gkoah9nghCbs6KzCReIegOyF9riA?purpose=inline)
+
+[medium.com](https://medium.com/codetodeploy/12-full-stack-project-ideas-with-designs-for-your-developer-portfolio-0f87a8057134?utm_source=chatgpt.com)
+
+MUVANTA needs an administration system to manage the platform.
+
+### **Catalogue management**
+
+- Add content metadata.
+- Edit content metadata.
+- Remove incorrect records.
+- Manage genres.
+- Manage languages.
+- Manage countries.
+- Manage cast and crew.
+- Manage posters and artwork.
+- Manage release information.
+- Manage content relationships.
+- Identify duplicate titles.
+
+### **Homepage management**
+
+- Manage featured content.
+- Manage trending sections.
+- Create editorial collections.
+- Organise homepage sections.
+- Schedule content promotions.
+
+### **User management**
+
+- View user accounts.
+- Manage reported accounts.
+- Handle abuse reports.
+- Moderate reviews and comments.
+- Suspend accounts when justified.
+- Manage account appeals.
+
+### **Platform analytics**
+
+- Total registered users.
+- Active users.
+- New registrations.
+- Catalogue growth.
+- User-generated reviews.
+- Popular content.
+- Recommendation engagement.
+- Error reports.
+- Platform performance.
+
+Admin access must be protected through role-based permissions. Administrators should not automatically have unrestricted access to private user notes.
+
+# **20. UI/UX and Navigation Features**
+
+Our previous MUVANTA design work should not be lost.
+
+### **Existing visual components to preserve and evaluate**
+
+- Cinematic poster grid.
+- Archive shelf.
+- Filmstrip discovery.
+- 3D archive orb.
+- Editorial content presentation.
+- Existing catalogue layout.
+- Search and filter interfaces.
+
+### **Application interface**
+
+- Responsive desktop layout.
+- Responsive mobile layout.
+- Tablet layout.
+- Dark cinematic theme.
+- Accessible typography.
+- Consistent spacing.
+- Reusable components.
+- Skeleton loading.
+- Empty states.
+- Error states.
+- Success feedback.
+- Confirmation dialogs.
+- Keyboard navigation.
+- Screen-reader accessibility.
+- Fast page transitions.
+- Appropriate animations.
+
+### **Personalisation**
+
+- Customisable homepage sections.
+- Customisable profile.
+- Grid/list preferences.
+- Sorting preferences.
+- Theme preferences where appropriate.
+- Notification preferences.
+
+# **21. Technical, Security and Infrastructure Features**
+
+These are not necessarily visible to users, but they are essential for a real commercial application.
+
+| Area            | Required capabilities                   |
+| --------------- | --------------------------------------- |
+| Frontend        | Next.js, React, TypeScript              |
+| Backend         | Supabase                                |
+| Database        | PostgreSQL                              |
+| Authentication  | Supabase Auth                           |
+| Security        | Row Level Security                      |
+| API             | Validated server-side operations        |
+| Storage         | Secure file and image handling          |
+| Performance     | Caching and optimisation                |
+| SEO             | Metadata, indexing and structured data  |
+| Monitoring      | Errors and performance monitoring       |
+| Reliability     | Backups and recovery                    |
+| Testing         | Unit, integration and end-to-end tests  |
+| Deployment      | Production hosting and CI/CD            |
+| Version control | GitHub                                  |
+| Privacy         | Data export and account deletion        |
+| Scalability     | Efficient queries and database indexing |
+
+# **22. Commercial and Legal Features**
+
+To make MUVANTA a legitimate public-facing business:
+
+- Privacy Policy.
+- Terms of Service.
+- Cookie and tracking disclosures where applicable.
+- Copyright policy.
+- Data protection compliance.
+- User consent management where required.
+- Community guidelines.
+- Content licensing compliance.
+- Secure account management.
+- Data retention policies.
+- Abuse reporting.
+- Accessibility compliance.
+- Subscription infrastructure when approved.
+- Payment integration when approved.
+- Subscription management.
+- Cancellation and refund processes where applicable.
+
+No paid service, external API or payment system should be integrated without evaluating its costs, permissions and legal requirements.
+
+# **23. Our Complete Feature Priority**
+
+Not every feature should be developed simultaneously.
+
+Here is how I would organise the implementation.
+
+| Priority | Feature groups                             | Development stage           |
+| -------- | ------------------------------------------ | --------------------------- |
+| P0       | Foundation, existing UI, architecture      | Phase 1                     |
+| P0       | Authentication, database, personal library | Phase 2                     |
+| P0       | Movie and series tracking                  | Phase 2                     |
+| P0       | Ratings, notes and collections             | Phase 2–3                   |
+| P0       | Search, discovery and content details      | Phase 1–2                   |
+| P1       | Statistics and analytics                   | Phase 3                     |
+| P1       | Personalised recommendations               | Phase 3                     |
+| P1       | Mood-based discovery                       | Phase 1–3                   |
+| P1       | Import, export and offline sync            | Phase 2–3                   |
+| P2       | Public profiles and social features        | Phase 4                     |
+| P2       | Community and moderation                   | Phase 4                     |
+| P2       | Notifications                              | Phase 3–4                   |
+| P2       | Advanced administration                    | Phase 4–5                   |
+| P3       | Advanced machine-learning recommendations  | Later upgrades              |
+| P3       | Android application                        | Phase 5 / product expansion |
+| P3       | Monetisation and subscriptions             | After product validation    |
+
+P0 means essential for the initial product, not that everything in it must be completed before the first development milestone.
+
+# **24. Our Main USP — Why Would Someone Choose MUVANTA?**
+
+These are the product differentiators we should aim to deliver.
+
+# **01**
+
+**One home for all entertainment**
+
+Movies, series, anime and documentaries in one unified platform.
+
+# **02**
+
+**Lifetime entertainment memory**
+
+A complete personal record of what someone has watched, rated, reviewed and collected.
+
+# **03**
+
+**Emotion-first discovery**
+
+Find something based on how you feel, not just its genre.
+
+# **04**
+
+**Taste intelligence**
+
+Understand how your entertainment preferences evolve over time.
+
+# **05**
+
+**Explainable recommendations**
+
+Discover relevant entertainment with understandable reasons behind suggestions.
+
+# **06**
+
+**Personal entertainment identity**
+
+Build collections, viewing history, reviews and a personal cinematic identity.
+
+# **07**
+
+**Discovery through people**
+
+Find people with similar entertainment preferences and explore their discoveries.
+
+# **25. Final Master Scope**
+
+This is the complete product scope we should use as our reference when building MUVANTA.
+
+| No. | Feature category               | Scope                            |
+| --- | ------------------------------ | -------------------------------- |
+| 1   | Entertainment discovery        | Core                             |
+| 2   | Search and advanced filters    | Core                             |
+| 3   | Movie and series details       | Core                             |
+| 4   | Personal entertainment library | Core                             |
+| 5   | Movie tracking                 | Core                             |
+| 6   | Series and episode tracking    | Core                             |
+| 7   | Ratings and reviews            | Core                             |
+| 8   | Custom collections             | Core                             |
+| 9   | Statistics and analytics       | Core                             |
+| 10  | Recommendation engine          | Core, developed progressively    |
+| 11  | Mood-based discovery           | Core                             |
+| 12  | User accounts and profiles     | Core                             |
+| 13  | Social and community           | Later phase                      |
+| 14  | Streaming availability         | Dependent on licensed data       |
+| 15  | Import, export and backup      | Core                             |
+| 16  | Offline and synchronisation    | Core                             |
+| 17  | Notifications                  | Later phase                      |
+| 18  | Dynamic homepage               | Core                             |
+| 19  | Admin panel                    | Core operational requirement     |
+| 20  | UI/UX system                   | Core                             |
+| 21  | Security and infrastructure    | Mandatory                        |
+| 22  | Legal and commercial readiness | Mandatory before relevant launch |
+
+**One important distinction:** This is our consolidated target feature specification, not a claim that all these features are already implemented or formally locked. Some are established project requirements; others are proposed extensions that must be approved and specified before development.
+
+My recommendation is to treat this as the master feature inventory and give every feature a unique ID, priority, dependencies, database requirements, acceptance criteria and implementation phase. That will prevent AI Studio or Gemini from forgetting features, inventing completed functionality or rebuilding the same component unnecessarily.
+
+The ultimate goal is to make MUVANTA a complete entertainment management platform rather than simply another movie-rating website.

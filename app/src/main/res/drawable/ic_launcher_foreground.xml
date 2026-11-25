@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer cinema film frame in warm brass -->
+    <path
+        android:fillColor="#B89A62"
+        android:pathData="M29,28 H79 C81.2,28 83,29.8 83,32 V76 C83,78.2 81.2,80 79,80 H29 C26.8,80 25,78.2 25,76 V32 C25,29.8 26.8,28 29,28 Z M30,34 V41 H35 V34 Z M30,46 V53 H35 V46 Z M30,58 V65 H35 V58 Z M30,70 V74 H35 V70 Z M73,34 V41 H78 V34 Z M73,46 V53 H78 V46 Z M73,58 V65 H78 V58 Z M73,70 V74 H78 V70 Z M39,34 V74 H69 V34 Z" />
+    <!-- Bold Editorial M monogram inside the cinema frame -->
+    <path
+        android:fillColor="#F2F0E9"
+        android:pathData="M43,66 V42 H47.6 L54,54.2 L60.4,42 H65 V66 H60.6 V50.6 L55.4,60.4 H52.6 L47.4,50.6 V66 Z" />
+</vector>

@@ -1,0 +1,6 @@
+{
+  "name": "Muvanta",
+  "description": "Curated lifetime cinema and television archive featuring 1,000 ranked movies and 300 series with Grid, Archival Shelf, Filmstrip, and 3D Orb discovery, live metadata caching, and local JSON/CSV backup.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

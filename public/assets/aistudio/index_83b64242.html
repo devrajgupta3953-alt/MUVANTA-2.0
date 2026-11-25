@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MUVANTA: A curated lifetime cinema and television library of 1,000 films and 300 series with editorial shelf, interactive 3D WebGL orb, filmstrip discovery, and local progress backup." />
+  <meta property="og:title" content="MUVANTA | Your World of Stories" />
+  <meta property="og:description" content="Discover, track, rate, and archive 1,000 ranked movies and 300 television series." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23111210'/%3E%3Crect x='5' y='6' width='22' height='20' rx='2' fill='none' stroke='%23B89A62' stroke-width='2'/%3E%3Cline x1='10' y1='6' x2='10' y2='26' stroke='%23B89A62' stroke-width='1.5'/%3E%3Cline x1='22' y1='6' x2='22' y2='26' stroke='%23B89A62' stroke-width='1.5'/%3E%3C/svg%3E" />
+  <title>MUVANTA | Your World of Stories</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+          },
+          colors: {
+            bg: '#111210',
+            surface: '#1B1C19',
+            elevated: '#242520',
+            ink: '#F2F0E9',
+            secondary: '#A6A49B',
+            muted: '#77776F',
+            brass: '#B89A62',
+            line: '#34352F',
+            ok: '#5D8A66',
+            warn: '#B88B4A',
+            err: '#B85C5C',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg: #111210;
+      --surface: #1B1C19;
+      --elevated: #242520;
+      --text-primary: #F2F0E9;
+      --text-secondary: #A6A49B;
+      --text-muted: #77776F;
+      --accent: #B89A62;
+      --border: #34352F;
+      --success: #5D8A66;
+      --warning: #B88B4A;
+      --error: #B85C5C;
+      --radius: 4px;
+    }
+
+    html, body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .poster-frame {
+      aspect-ratio: 2 / 3;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .btn-base {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 38px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--text-primary);
+      transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+      cursor: pointer;
+    }
+
+    .btn-base:hover:not(:disabled) {
+      border-color: var(--accent);
+      background-color: var(--elevated);
+    }
+
+    .btn-base:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+    .btn-accent {
+      background-color: var(--elevated);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .btn-accent:hover:not(:disabled) {
+      background-color: var(--accent);
+      color: #111210;
+    }
+
+    .btn-danger {
+      border-color: rgba(184, 92, 92, 0.55);
+      color: #E3A0A0;
+      background-color: rgba(184, 92, 92, 0.08);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      border-color: var(--error);
+      background-color: rgba(184, 92, 92, 0.18);
+      color: var(--text-primary);
+    }
+
+    .field-control {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      min-height: 40px;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 150ms ease;
+    }
+
+    .field-control:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .nav-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      transition: color 150ms ease, border-color 150ms ease;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-link[aria-current="page"] {
+      color: var(--text-primary);
+      border-bottom-color: var(--accent);
+    }
+
+    .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 36px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border-radius: 3px;
+      color: var(--text-secondary);
+      transition: background-color 150ms ease, color 150ms ease;
+      cursor: pointer;
+    }
+
+    .mode-btn[aria-pressed="true"] {
+      background-color: var(--elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--accent);
+    }
+
+    /* Filmstrip Horizontal Track */
+    .filmstrip-track {
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      padding: 0.75rem 0 1rem;
+      cursor: grab;
+    }
+    .filmstrip-track::-webkit-scrollbar {
+      display: none;
+    }
+    .filmstrip-track.dragging {
+      cursor: grabbing;
+      user-select: none;
+    }
+    .filmstrip-sprocket {
+      height: 10px;
+      background-image: repeating-linear-gradient(
+        to right,
+        transparent 0px,
+        transparent 10px,
+        #262721 10px,
+        #262721 20px
+      );
+      border-top: 1px solid #262721;
+      border-bottom: 1px solid #262721;
+    }
+
+    /* Archival Shelf Ledge */
+    .shelf-row {
+      position: relative;
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 6px solid #24221D;
+      box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.85);
+    }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="flex flex-col antialiased selection:bg-brass/25 selection:text-ink">
+
+  <a href="#mainContent" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-elevated focus:text-ink focus:border focus:border-brass focus:rounded">
+    Skip to main content
+  </a>
+
+  <div id="storageWarning" role="alert" class="hidden border-b border-warn/50 bg-surface px-4 py-2.5 text-center text-sm text-ink">
+    Browser storage is restricted or full. Export a JSON backup in Backup &amp; Data to preserve your progress.
+  </div>
+
+  <!-- Editorial Header -->
+  <header class="sticky top-0 z-40 border-b border-line bg-bg/95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <button type="button" id="btnBrandHome" class="flex items-center gap-3 text-left cursor-pointer min-w-0">
+        <svg aria-hidden="true" class="w-5 h-5 text-brass shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>
+        </svg>
+        <div class="min-w-0">
+          <span class="font-serif text-lg sm:text-xl font-semibold tracking-wide text-ink block leading-none">MUVANTA</span>
+          <span class="text-[11px] uppercase tracking-widest text-muted hidden sm:block mt-0.5">Your World of Stories</span>
+        </div>
+      </button>
+
+      <nav aria-label="Primary navigation" class="hidden md:flex items-center gap-6">
+        <button type="button" data-nav="collection" aria-current="page" class="nav-link">Collection</button>
+        <button type="button" data-nav="movies" class="nav-link">Movies</button>
+        <button type="button" data-nav="series" class="nav-link">Series</button>
+        <button type="button" data-nav="library" class="nav-link">My Library</button>
+        <button type="button" data-nav="stats" class="nav-link">Statistics</button>
+        <button type="button" data-nav="backup" class="nav-link">Backup</button>
+      </nav>
+
+      <button type="button" id="btnMobileMenu" aria-expanded="false" aria-controls="mobileNav" aria-label="Toggle navigation menu" class="md:hidden btn-base px-2.5">
+        <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>
+        </svg>
+        <span>Menu</span>
+      </button>
+    </div>
+
+    <nav id="mobileNav" aria-label="Mobile navigation" class="hidden md:hidden border-t border-line bg-surface px-4 py-3">
+      <div class="flex flex-col gap-1">
+        <button type="button" data-nav="collection" aria-current="page" class="nav-link justify-start px-2">Collection</button>
+        <button type="button" data-nav="movies" class="nav-link justify-start px-2">Movies</button>
+        <button type="button" data-nav="series" class="nav-link justify-start px-2">Series</button>
+        <button type="button" data-nav="library" class="nav-link justify-start px-2">My Library</button>
+        <button type="button" data-nav="stats" class="nav-link justify-start px-2">Statistics</button>
+        <button type="button" data-nav="backup" class="nav-link justify-start px-2">Backup</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="mainContent" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ==================== VIEW 1: CATALOGUE & DISCOVERY ==================== -->
+    <div id="viewCatalogue">
+
+      <!-- Editorial Introduction & Compact Progress Strip -->
+      <section class="pb-6 border-b border-line">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div class="max-w-2xl">
+            <p class="text-xs font-medium tracking-widest uppercase text-brass mb-2" id="viewEyebrow">Curated Lifetime Archive</p>
+            <h1 class="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-ink leading-tight" id="viewHeading">
+              The Ultimate Lifetime Cinema &amp; Television Collection
+            </h1>
+            <p class="text-sm sm:text-base text-secondary mt-2 leading-relaxed" id="viewSubtitle">
+              1,000 ranked films and 300 television series organized from all-time masterworks to comfort viewing.
+            </p>
+          </div>
+
+          <div class="w-full lg:w-80 shrink-0 bg-surface border border-line rounded p-4">
+            <div class="flex items-center justify-between text-sm mb-2">
+              <span class="font-medium text-ink">Viewing Progress</span>
+              <button type="button" id="btnInlineStats" class="text-xs font-medium text-brass hover:underline cursor-pointer">
+                View statistics
+              </button>
+            </div>
+            <div class="w-full h-1.5 bg-bg rounded-sm overflow-hidden mb-2.5" role="progressbar" aria-label="Overall completed titles" aria-valuemin="0" aria-valuemax="1300" aria-valuenow="0" id="progOverall">
+              <div id="statOverallBar" class="h-full bg-brass transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-secondary">
+              <span id="statOverallText">0 / 1,300 watched (0%)</span>
+              <span id="statSplitText" class="text-muted">0 films · 0 series</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Curated Cinema Filmstrip (Collection Overview Only) -->
+      <section id="filmstripSection" aria-label="Featured archive filmstrip" class="py-6 border-b border-line">
+        <div class="flex items-center justify-between gap-4 mb-3">
+          <div>
+            <h2 class="font-serif text-lg font-semibold text-ink">Essential Archive Reel</h2>
+            <p class="text-xs text-secondary">Drag or scroll through top-ranked milestones from both master lists.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btnStripPrev" aria-label="Scroll filmstrip left" class="btn-base px-2.5 min-h-[34px]">
+              <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button type="button" id="btnStripNext" aria-label="Scroll filmstrip right" class="btn-base px-2.5 min-h-[34px]">
+              <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="filmstrip-sprocket" aria-hidden="true"></div>
+        <div id="filmstripTrack" class="filmstrip-track"></div>
+        <div class="filmstrip-sprocket" aria-hidden="true"></div>
+      </section>
+
+      <!-- Discovery Controls & View Mode Switcher -->
+      <section aria-label="Search and filter catalogue" class="py-5 space-y-4">
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+          <!-- Primary Search -->
+          <div class="relative flex-1">
+            <label for="searchInput" class="sr-only">Search by title, year, or rank</label>
+            <svg aria-hidden="true" class="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input id="searchInput" type="search" placeholder="Search title, release year, or #rank (e.g. Godfather, 1994, #12)" class="field-control w-full pl-10 pr-9" />
+            <button type="button" id="btnClearSearch" aria-label="Clear search" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-secondary hover:text-ink cursor-pointer">
+              <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- View Mode Switcher (Grid / Shelf / 3D Orb) + Filters + Pick -->
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div role="group" aria-label="Presentation mode" class="inline-flex items-center p-1 bg-surface border border-line rounded">
+              <button type="button" data-mode="grid" aria-pressed="true" class="mode-btn">
+                <svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                <span>Grid</span>
+              </button>
+              <button type="button" data-mode="shelf" aria-pressed="false" class="mode-btn">
+                <svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                <span>Shelf</span>
+              </button>
+              <button type="button" data-mode="orb" aria-pressed="false" class="mode-btn">
+                <svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                <span>3D Orb</span>
+              </button>
+            </div>
+
+            <button type="button" id="btnToggleFilters" aria-expanded="false" aria-controls="advancedFiltersPanel" class="btn-base">
+              <svg aria-hidden="true" class="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>
+              </svg>
+              <span>Filters</span>
+              <span id="activeFilterCount" class="hidden px-1.5 py-0.5 text-xs bg-elevated border border-brass/50 text-brass rounded-sm">0</span>
+            </button>
+
+            <button type="button" id="btnRandomPick" class="btn-base btn-accent">
+              <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/>
+              </svg>
+              <span>Pick Unwatched</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Expandable Advanced Filters -->
+        <div id="advancedFiltersPanel" class="hidden bg-surface border border-line rounded p-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label for="filterType" class="block text-xs font-medium text-secondary mb-1.5">Content Type</label>
+              <select id="filterType" class="field-control w-full">
+                <option value="all">All Titles (1,300)</option>
+                <option value="movie">Movies (1,000)</option>
+                <option value="series">Series (300)</option>
+              </select>
+            </div>
+            <div>
+              <label for="filterStatus" class="block text-xs font-medium text-secondary mb-1.5">Viewing Status</label>
+              <select id="filterStatus" class="field-control w-full">
+                <option value="all">All Statuses</option>
+                <option value="unwatched">Unwatched (Not Started)</option>
+                <option value="watching">Currently Watching</option>
+                <option value="bookmarked">Watchlist / Bookmarked</option>
+                <option value="watched">Watched</option>
+                <option value="not-completed">Not Completed</option>
+                <option value="rated">Rated by Me</option>
+              </select>
+            </div>
+            <div>
+              <label for="filterTier" class="block text-xs font-medium text-secondary mb-1.5">Collection Tier</label>
+              <select id="filterTier" class="field-control w-full">
+                <option value="all">All Tiers</option>
+                <option value="m1">Movies 1 to 150: Masterpieces</option>
+                <option value="m2">Movies 151 to 350: World &amp; Indian Classics</option>
+                <option value="m3">Movies 351 to 600: Thrillers, Sci-Fi &amp; Drama</option>
+                <option value="m4">Movies 601 to 800: Crowd-Pleasers</option>
+                <option value="m5">Movies 801 to 1,000: Time-Pass</option>
+                <option value="s1">Series 1 to 50: All-Time Series</option>
+                <option value="s2">Series 51 to 120: Global, Anime &amp; Indian</option>
+                <option value="s3">Series 121 to 200: Crime, Sci-Fi &amp; Sitcoms</option>
+                <option value="s4">Series 201 to 250: Gripping Crowd-Pleasers</option>
+                <option value="s5">Series 251 to 300: Comfort Binge</option>
+              </select>
+            </div>
+            <div>
+              <label for="filterDecade" class="block text-xs font-medium text-secondary mb-1.5">Release Decade</label>
+              <select id="filterDecade" class="field-control w-full">
+                <option value="all">All Decades</option>
+                <option value="2020">2020s</option>
+                <option value="2010">2010s</option>
+                <option value="2000">2000s</option>
+                <option value="1990">1990s</option>
+                <option value="1980">1980s</option>
+                <option value="1970">1970s</option>
+                <option value="1960">1960s</option>
+                <option value="1950">1950s</option>
+                <option value="1940">1940s</option>
+                <option value="1930">1930s &amp; Earlier</option>
+              </select>
+            </div>
+            <div>
+              <label for="sortBy" class="block text-xs font-medium text-secondary mb-1.5">Sort Order</label>
+              <select id="sortBy" class="field-control w-full">
+                <option value="rank-asc">Collection Rank (#1 First)</option>
+                <option value="rank-desc">Collection Rank (Descending)</option>
+                <option value="year-desc">Release Year (Newest)</option>
+                <option value="year-asc">Release Year (Oldest)</option>
+                <option value="title-asc">Title (A to Z)</option>
+                <option value="rating-desc">Personal Rating (Highest)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Count & Active Filter Chips -->
+        <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="resultCount" aria-live="polite" class="text-secondary">Showing 1,300 titles</span>
+            <div id="activeFilterChips" class="flex flex-wrap items-center gap-2"></div>
+          </div>
+          <button type="button" id="btnResetFilters" class="hidden text-xs font-medium text-brass hover:underline cursor-pointer">
+            Reset all filters
+          </button>
+        </div>
+      </section>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-16 px-6 bg-surface border border-line rounded">
+        <h2 class="font-serif text-xl font-semibold text-ink mb-1">No matching titles</h2>
+        <p class="text-sm text-secondary mb-5 max-w-md mx-auto">No entries in the collection match your current search or filter settings.</p>
+        <button type="button" id="btnEmptyReset" class="btn-base btn-accent">Reset all filters</button>
+      </div>
+
+      <!-- Mode 1 & 2 Container: Poster Grid / Archival Shelf -->
+      <div id="mediaGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-5 gap-y-8"></div>
+
+      <!-- Mode 3 Container: Interactive 3D WebGL Archive Orb -->
+      <div id="orbStageWrap" class="hidden bg-surface border border-line rounded overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-line bg-bg text-xs text-secondary">
+          <span>Interactive 3D Archive Orb (showing current page titles). Drag to rotate, scroll to zoom, click any plate to open details.</span>
+          <span id="orbHoverLabel" class="font-medium text-brass">Hover a plate to inspect</span>
+        </div>
+        <div id="orbCanvasHost" class="relative w-full h-[540px] bg-bg cursor-grab active:cursor-grabbing"></div>
+      </div>
+
+      <!-- Pagination -->
+      <nav aria-label="Pagination" id="paginationBar" class="mt-10 pt-6 border-t border-line flex flex-wrap items-center justify-between gap-4">
+        <div class="text-sm text-secondary" id="pageInfo" aria-live="polite">Page 1 of 22</div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnPrevPage" class="btn-base">
+            <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Previous</span>
+          </button>
+          <button type="button" id="btnNextPage" class="btn-base">
+            <span>Next</span>
+            <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- ==================== VIEW 2: STATISTICS ==================== -->
+    <section id="viewStats" class="hidden space-y-8" aria-labelledby="statsHeading">
+      <div class="border-b border-line pb-5">
+        <p class="text-xs font-medium tracking-widest uppercase text-brass mb-2">Personal Archive Metrics</p>
+        <h1 id="statsHeading" class="font-serif text-3xl font-semibold text-ink">Statistics &amp; Viewing Progress</h1>
+        <p class="text-sm text-secondary mt-2">Calculated strictly from the 1,300 collection entries and your recorded viewing activity.</p>
+      </div>
+
+      <div id="statsSummaryGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+      <div class="bg-surface border border-line rounded p-5">
+        <h2 class="font-serif text-lg font-semibold text-ink mb-4">Viewing Status Distribution</h2>
+        <div id="statsStatusDist" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+      </div>
+
+      <div class="bg-surface border border-line rounded p-5">
+        <h2 class="font-serif text-lg font-semibold text-ink mb-4">Completion by Collection Tier</h2>
+        <div id="statsTierList" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: BACKUP & DATA ==================== -->
+    <section id="viewBackup" class="hidden space-y-8 max-w-3xl" aria-labelledby="backupHeading">
+      <div class="border-b border-line pb-5">
+        <p class="text-xs font-medium tracking-widest uppercase text-brass mb-2">Local Data Ownership</p>
+        <h1 id="backupHeading" class="font-serif text-3xl font-semibold text-ink">Backup &amp; Data Management</h1>
+        <p class="text-sm text-secondary mt-2">Export your viewing history, restore schema-validated backups, or host on GitHub Pages.</p>
+      </div>
+
+      <div class="bg-surface border border-line rounded p-6 space-y-5">
+        <div>
+          <h2 class="font-serif text-lg font-semibold text-ink">Export &amp; Restore Watchlist</h2>
+          <p class="text-sm text-secondary mt-1">All progress is saved in browser storage under <code class="text-ink bg-bg px-1 rounded">cinema_master_user_state_v1</code>.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" id="btnExportJson" class="btn-base btn-accent">Export JSON Backup</button>
+          <button type="button" id="btnExportCsv" class="btn-base">Export CSV</button>
+          <label for="inputImportJson" class="btn-base">Import JSON</label>
+          <input id="inputImportJson" type="file" accept=".json,application/json" class="sr-only" />
+          <button type="button" id="btnUndoImport" class="hidden btn-base">Undo Last Change</button>
+        </div>
+
+        <div id="importPreviewBox" class="hidden p-4 rounded bg-bg border border-brass space-y-3">
+          <div id="importPreviewText" class="text-sm text-ink"></div>
+          <div class="flex flex-wrap gap-2.5">
+            <button type="button" id="btnImportMerge" class="btn-base btn-accent">Merge with Existing</button>
+            <button type="button" id="btnImportReplace" class="btn-base">Replace All</button>
+            <button type="button" id="btnImportCancel" class="btn-base">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-line rounded p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-sm font-semibold text-ink">Reset Local Watch Progress</h2>
+          <p class="text-xs text-secondary mt-0.5">Clears all watched marks, ratings, and notes from this browser.</p>
+        </div>
+        <button type="button" id="btnResetProgress" class="btn-base btn-danger shrink-0">Clear All Progress</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line bg-bg py-6 px-4 sm:px-6 lg:px-8 text-xs text-muted">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>MUVANTA | Your World of Stories</span>
+      <span>Metadata via <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-ink underline">Wikipedia</a>, <a href="https://www.tvmaze.com/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-ink underline">TVmaze</a>, and iTunes Search API</span>
+    </div>
+  </footer>
+
+  <!-- Editorial Title Detail Dialog -->
+  <div id="detailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-surface border border-line rounded max-w-4xl w-full overflow-hidden my-auto">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-line bg-bg">
+        <div class="flex items-center gap-2.5 text-xs text-secondary min-w-0">
+          <span id="modalRankBadge" class="font-semibold text-brass">#1</span>
+          <span aria-hidden="true" class="text-line">/</span>
+          <span id="modalTypeBadge" class="text-ink font-medium">Movie</span>
+          <span aria-hidden="true" class="text-line hidden sm:inline">/</span>
+          <span id="modalTierLabel" class="truncate hidden sm:inline"></span>
+        </div>
+        <button type="button" id="btnCloseDetail" aria-label="Close title details" class="p-1.5 text-secondary hover:text-ink rounded cursor-pointer">
+          <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-5 sm:p-7 grid grid-cols-1 md:grid-cols-12 gap-7 max-h-[84vh] overflow-y-auto">
+        <div class="md:col-span-4 space-y-3">
+          <div id="modalPosterBox" class="poster-frame w-full overflow-hidden relative">
+            <img id="modalPosterImg" src="" alt="Title poster" referrerpolicy="no-referrer" class="w-full h-full object-cover hidden" />
+            <div id="modalPosterFallback" class="w-full h-full flex flex-col justify-between p-5 bg-elevated"></div>
+          </div>
+        </div>
+
+        <div class="md:col-span-8 space-y-6">
+          <div class="space-y-3">
+            <div>
+              <h2 id="modalTitle" class="font-serif text-2xl sm:text-3xl font-semibold text-ink leading-tight"></h2>
+              <div id="modalSubMeta" class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-secondary mt-2"></div>
+            </div>
+            <p id="modalDescription" class="text-sm text-secondary leading-relaxed"></p>
+            <div id="modalExtraTags" class="flex flex-wrap gap-2 pt-1"></div>
+          </div>
+
+          <div class="border-t border-line pt-5 space-y-5">
+            <div>
+              <div class="text-xs font-medium uppercase tracking-wider text-muted mb-2.5">Personal Watch Status</div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="modalStatusBtns">
+                <button type="button" data-status="unwatched" class="status-opt btn-base text-xs">Unwatched</button>
+                <button type="button" data-status="bookmarked" class="status-opt btn-base text-xs">Watchlist</button>
+                <button type="button" data-status="watching" class="status-opt btn-base text-xs">Watching</button>
+                <button type="button" data-status="watched" class="status-opt btn-base text-xs">Watched</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium uppercase tracking-wider text-muted">Personal Rating</span>
+                <span id="modalRatingText" class="text-xs font-medium text-brass">Unrated</span>
+              </div>
+              <div id="modalStars" class="flex items-center gap-1.5 flex-wrap" role="group" aria-label="Personal rating from 1 to 10"></div>
+            </div>
+
+            <div>
+              <label for="modalNotes" class="block text-xs font-medium uppercase tracking-wider text-muted mb-2">Personal Notes</label>
+              <textarea id="modalNotes" rows="3" maxlength="2000" placeholder="Record your thoughts, context, or viewing notes..." class="field-control w-full resize-y"></textarea>
+            </div>
+          </div>
+
+          <details class="border-t border-line pt-4">
+            <summary class="text-xs font-medium uppercase tracking-wider text-secondary hover:text-ink cursor-pointer select-none">
+              Metadata and Poster Options
+            </summary>
+            <div class="mt-4 space-y-4">
+              <div class="flex flex-wrap gap-2.5">
+                <button type="button" id="btnRefreshPoster" class="btn-base text-xs">Refresh Metadata</button>
+                <a id="modalWikiLink" href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" class="btn-base text-xs">Open on Wikipedia</a>
+              </div>
+              <div>
+                <label for="modalCustomPoster" class="block text-xs text-secondary mb-1.5">Custom Poster URL (HTTPS only)</label>
+                <div class="flex gap-2">
+                  <input id="modalCustomPoster" type="url" placeholder="https://example.com/poster.jpg" class="field-control flex-1 text-xs" />
+                  <button type="button" id="btnSaveCustomPoster" class="btn-base text-xs">Apply</button>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite" class="hidden fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded bg-elevated border border-brass text-ink text-sm"></div>
+
+  <!-- Embedded Dataset (1,000 Movies + 300 Series) -->
+  <script>
+const RAW_MOVIES = [[1, "The Godfather", 1972], [2, "The Shawshank Redemption", 1994], [3, "The Godfather Part II", 1974], [4, "Seven Samurai", 1954], [5, "The Dark Knight", 2008], [6, "12 Angry Men", 1957], [7, "Schindler's List", 1993], [8, "Pulp Fiction", 1994], [9, "The Lord of the Rings: The Return of the King", 2003], [10, "The Good, the Bad and the Ugly", 1966], [11, "The Lord of the Rings: The Fellowship of the Ring", 2001], [12, "Spirited Away", 2001], [13, "Parasite", 2019], [14, "Goodfellas", 1990], [15, "Harakiri", 1962], [16, "Pather Panchali", 1955], [17, "The Lord of the Rings: The Two Towers", 2002], [18, "One Flew Over the Cuckoo's Nest", 1975], [19, "Inception", 2010], [20, "Fight Club", 1999], [21, "The Empire Strikes Back", 1980], [22, "City of God", 2002], [23, "Interstellar", 2014], [24, "Se7en", 1995], [25, "The Silence of the Lambs", 1991], [26, "It's a Wonderful Life", 1946], [27, "Saving Private Ryan", 1998], [28, "The Matrix", 1999], [29, "Psycho", 1960], [30, "Rear Window", 1954], [31, "Cinema Paradiso", 1988], [32, "Apocalypse Now", 1979], [33, "2001: A Space Odyssey", 1968], [34, "Citizen Kane", 1941], [35, "Casablanca", 1942], [36, "Sunset Boulevard", 1950], [37, "Lawrence of Arabia", 1962], [38, "Vertigo", 1958], [39, "High and Low", 1963], [40, "Ikiru", 1952], [41, "Rashomon", 1950], [42, "Ran", 1985], [43, "Tokyo Story", 1953], [44, "In the Mood for Love", 2000], [45, "Once Upon a Time in the West", 1968], [46, "Once Upon a Time in America", 1984], [47, "Taxi Driver", 1976], [48, "Raging Bull", 1980], [49, "There Will Be Blood", 2007], [50, "No Country for Old Men", 2007], [51, "Whiplash", 2014], [52, "The Prestige", 2006], [53, "The Departed", 2006], [54, "Gladiator", 2000], [55, "Memento", 2000], [56, "Alien", 1979], [57, "Aliens", 1986], [58, "Terminator 2: Judgment Day", 1991], [59, "Back to the Future", 1985], [60, "Raiders of the Lost Ark", 1981], [61, "Jurassic Park", 1993], [62, "Jaws", 1975], [63, "Die Hard", 1988], [64, "Mad Max: Fury Road", 2015], [65, "Spider-Man: Into the Spider-Verse", 2018], [66, "Spider-Man: Across the Spider-Verse", 2023], [67, "Grave of the Fireflies", 1988], [68, "Princess Mononoke", 1997], [69, "Your Name.", 2016], [70, "Akira", 1988], [71, "Perfect Blue", 1997], [72, "Oldboy", 2003], [73, "Memories of Murder", 2003], [74, "The Handmaiden", 2016], [75, "A Separation", 2011], [76, "Children of Heaven", 1997], [77, "Amélie", 2001], [78, "The Intouchables", 2011], [79, "La Haine", 1995], [80, "The Lives of Others", 2006], [81, "Das Boot", 1981], [82, "Come and See", 1985], [83, "Stalker", 1979], [84, "Bicycle Thieves", 1948], [85, "8½", 1963], [86, "La Dolce Vita", 1960], [87, "The 400 Blows", 1959], [88, "Persona", 1966], [89, "The Seventh Seal", 1957], [90, "Fanny and Alexander", 1982], [91, "M", 1931], [92, "Metropolis", 1927], [93, "City Lights", 1931], [94, "Modern Times", 1936], [95, "The Great Dictator", 1940], [96, "Singin' in the Rain", 1952], [97, "The Apartment", 1960], [98, "Some Like It Hot", 1959], [99, "Double Indemnity", 1944], [100, "North by Northwest", 1959], [101, "Chinatown", 1974], [102, "The Shining", 1980], [103, "A Clockwork Orange", 1971], [104, "Full Metal Jacket", 1987], [105, "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb", 1964], [106, "Barry Lyndon", 1975], [107, "Paths of Glory", 1957], [108, "The Pianist", 2002], [109, "Inglourious Basterds", 2009], [110, "Django Unchained", 2012], [111, "Reservoir Dogs", 1992], [112, "Fargo", 1996], [113, "The Big Lebowski", 1998], [114, "Mulholland Drive", 2001], [115, "Eternal Sunshine of the Spotless Mind", 2004], [116, "The Truman Show", 1998], [117, "Good Will Hunting", 1997], [118, "Dead Poets Society", 1989], [119, "Forrest Gump", 1994], [120, "The Green Mile", 1999], [121, "A Beautiful Mind", 2001], [122, "L.A. Confidential", 1997], [123, "Heat", 1995], [124, "Casino", 1995], [125, "Scarface", 1932], [126, "The Usual Suspects", 1995], [127, "Leon: The Professional", 1994], [128, "American History X", 1998], [129, "Requiem for a Dream", 2000], [130, "Pan's Labyrinth", 2006], [131, "The Secret in Their Eyes", 2009], [132, "Yojimbo", 1961], [133, "Throne of Blood", 1957], [134, "Sholay", 1975], [135, "Mughal-e-Azam", 1960], [136, "Pyaasa", 1957], [137, "Apur Sansar", 1959], [138, "Aparajito", 1956], [139, "Charulata", 1964], [140, "Nayakan", 1987], [141, "Satya", 1998], [142, "Gangs of Wasseypur", 2012], [143, "Iruvar", 1997], [144, "Manichitrathazhu", 1993], [145, "Kireedam", 1989], [146, "3 Idiots", 2009], [147, "Lagaan", 2001], [148, "Swades", 2004], [149, "Taare Zameen Par", 2007], [150, "Dangal", 2016], [151, "Dil Chahta Hai", 2001], [152, "Rang De Basanti", 2006], [153, "Black Friday", 2004], [154, "Udaan", 2010], [155, "Masaan", 2015], [156, "Tumbbad", 2018], [157, "Andhadhun", 2018], [158, "Drishyam", 2013], [159, "Kumbalangi Nights", 2019], [160, "Super Deluxe", 2019], [161, "Visaranai", 2015], [162, "Vada Chennai", 2018], [163, "Asuran", 2019], [164, "Pariyerum Perumal", 2018], [165, "Kaithi", 2019], [166, "Vikram", 2022], [167, "Sairat", 2016], [168, "Court", 2014], [169, "Kantara", 2022], [170, "Lucia", 2013], [171, "Garuda Gamana Vrishabha Vahana", 2021], [172, "C/o Kancharapalem", 2018], [173, "Jersey", 2019], [174, "RRR", 2022], [175, "Baahubali 2: The Conclusion", 2017], [176, "Bajrangi Bhaijaan", 2015], [177, "Chak De! India", 2007], [178, "Zindagi Na Milegi Dobara", 2011], [179, "Queen", 2013], [180, "Piku", 2015], [181, "Barfi!", 2012], [182, "Haider", 2014], [183, "Maqbool", 2003], [184, "Omkara", 2006], [185, "Kahaani", 2012], [186, "Gully Boy", 2019], [187, "Sardar Udham", 2021], [188, "12th Fail", 2023], [189, "Laapataa Ladies", 2023], [190, "Aavesham", 2024], [191, "Manjummel Boys", 2024], [192, "Bramayugam", 2024], [193, "Maharaja", 2024], [194, "Meiyazhagan", 2024], [195, "Close-Up", 1990], [196, "Beau Travail", 1999], [197, "A Brighter Summer Day", 1991], [198, "Yi Yi", 2000], [199, "The Searchers", 1956], [200, "Blade Runner", 1982], [201, "Andrei Rublev", 1966], [202, "Mirror", 1975], [203, "The Conversation", 1974], [204, "Ugetsu", 1953], [205, "Do the Right Thing", 1989], [206, "WALL-E", 2008], [207, "The Rules of the Game", 1939], [208, "The World of Apu", 1959], [209, "Late Spring", 1949], [210, "Blue Velvet", 1986], [211, "My Neighbor Totoro", 1988], [212, "Burning", 2018], [213, "A Woman Under the Influence", 1974], [214, "Farewell My Concubine", 1993], [215, "Under the Skin", 2013], [216, "O.J.: Made in America", 2016], [217, "The Night of the Hunter", 1955], [218, "Ordet", 1955], [219, "Portrait of a Lady on Fire", 2019], [220, "Paris, Texas", 1984], [221, "The Human Condition III: A Soldier's Prayer", 1961], [222, "The Battle of Algiers", 1966], [223, "The Piano", 1993], [224, "Three Colors: Red", 1994], [225, "Hiroshima Mon Amour", 1959], [226, "4 Months, 3 Weeks and 2 Days", 2007], [227, "Aguirre, the Wrath of God", 1972], [228, "Breathless", 1960], [229, "Cléo from 5 to 7", 1962], [230, "A City of Sadness", 1989], [231, "Au Hasard Balthazar", 1966], [232, "Moonlight", 2016], [233, "Drive My Car", 2021], [234, "Star Wars: Episode V – The Empire Strikes Back", 1980], [235, "Oppenheimer", 2023], [236, "Three Colors: Blue", 1993], [237, "Sansho the Bailiff", 1954], [238, "The Leopard", 1963], [239, "Crouching Tiger, Hidden Dragon", 2000], [240, "Nashville", 1975], [241, "Before Sunset", 2004], [242, "Children of Men", 2006], [243, "The Zone of Interest", 2023], [244, "The Cloud-Capped Star", 1960], [245, "All We Imagine as Light", 2024], [246, "Contempt", 1963], [247, "Manila in the Claws of Light", 1975], [248, "Toy Story", 1995], [249, "Unforgiven", 1992], [250, "The End of Evangelion", 1997], [251, "McCabe & Mrs. Miller", 1971], [252, "Badlands", 1973], [253, "Caché", 2005], [254, "The Human Condition I: No Greater Love", 1959], [255, "The Thin Red Line", 1998], [256, "Aftersun", 2022], [257, "The Music Room", 1958], [258, "The Mother and the Whore", 1973], [259, "Where Is the Friend's House?", 1987], [260, "Chungking Express", 1994], [261, "Werckmeister Harmonies", 2000], [262, "L'Avventura", 1960], [263, "PlayTime", 1967], [264, "Before Sunrise", 1995], [265, "Star Wars", 1977], [266, "Tropical Malady", 2004], [267, "The Tale of the Princess Kaguya", 2013], [268, "Touch of Evil", 1958], [269, "The Man Who Shot Liberty Valance", 1962], [270, "To Live", 1994], [271, "A Man Escaped", 1956], [272, "Wild Strawberries", 1957], [273, "Pinocchio", 1940], [274, "The Human Condition II: Road to Eternity", 1959], [275, "Ghost in the Shell", 1995], [276, "Shoplifters", 2018], [277, "Solaris", 1972], [278, "The Tree of Life", 2011], [279, "Killer of Sheep", 1978], [280, "The Spirit of the Beehive", 1973], [281, "La Ciénaga", 2001], [282, "Roma", 2018], [283, "Zodiac", 2007], [284, "Uncle Boonmee Who Can Recall His Past Lives", 2010], [285, "Amour", 2012], [286, "Black Girl", 1966], [287, "Don't Look Now", 1973], [288, "Once Upon a Time in Anatolia", 2011], [289, "Decision to Leave", 2022], [290, "Taste of Cherry", 1997], [291, "The Master", 2012], [292, "The Wages of Fear", 1953], [293, "Elippathayam", 1981], [294, "Days of Heaven", 1978], [295, "The Third Man", 1949], [296, "Get Out", 2017], [297, "Winter Sleep", 2014], [298, "Groundhog Day", 1993], [299, "Nausicaä of the Valley of the Wind", 1984], [300, "Early Summer", 1951], [301, "Ratatouille", 2007], [302, "The Social Network", 2010], [303, "Daughters of the Dust", 1991], [304, "The Travelling Players", 1975], [305, "Platform", 2000], [306, "Carol", 2015], [307, "All That Jazz", 1979], [308, "Paddington 2", 2017], [309, "Kummatty", 1979], [310, "Secrets & Lies", 1996], [311, "Cure", 1997], [312, "Eyes Wide Shut", 1999], [313, "Kes", 1969], [314, "The Red Shoes", 1948], [315, "Le Samouraï", 1967], [316, "Brokeback Mountain", 2005], [317, "All About My Mother", 1999], [318, "Dune: Part Two", 2024], [319, "The Lion King", 1994], [320, "Malcolm X", 1992], [321, "The Life of Oharu", 1952], [322, "The Life and Death of Colonel Blimp", 1943], [323, "All About Eve", 1950], [324, "Ali: Fear Eats the Soul", 1974], [325, "Wings of Desire", 1987], [326, "The Iron Giant", 1999], [327, "Still Walking", 2008], [328, "Wanda", 1970], [329, "Notorious", 1946], [330, "Kaagaz Ke Phool", 1959], [331, "Norte, the End of History", 2013], [332, "Stop Making Sense", 1984], [333, "E.T. the Extra-Terrestrial", 1982], [334, "The Conformist", 1970], [335, "The White Ribbon", 2009], [336, "Happy Together", 1997], [337, "12 Years a Slave", 2013], [338, "Sweet Smell of Success", 1957], [339, "Rio Bravo", 1959], [340, "A River Called Titas", 1973], [341, "The Incredibles", 2004], [342, "Distant Voices, Still Lives", 1988], [343, "The Double Life of Véronique", 1991], [344, "The Wild Bunch", 1969], [345, "Y Tu Mamá También", 2001], [346, "Talk to Her", 2002], [347, "Memories of Underdevelopment", 1968], [348, "A Touch of Zen", 1971], [349, "Amadeus", 1984], [350, "The Ascent", 1977], [351, "Titanic", 1997], [352, "Millennium Actress", 2001], [353, "Network", 1976], [354, "Arrival", 2016], [355, "The Terminator", 1984], [356, "Yeelen", 1987], [357, "Toni Erdmann", 2016], [358, "The Housemaid", 1960], [359, "Anatomy of a Fall", 2023], [360, "Children of Paradise", 1945], [361, "The Grand Budapest Hotel", 2014], [362, "It's Such a Beautiful Day", 2012], [363, "Poetry", 2010], [364, "Subarnarekha", 1965], [365, "Black Narcissus", 1947], [366, "Seven", 1995], [367, "The Assassination of Jesse James by the Coward Robert Ford", 2007], [368, "World of Tomorrow", 2015], [369, "The Piano Teacher", 2001], [370, "Boogie Nights", 1997], [371, "In a Lonely Place", 1950], [372, "Cries and Whispers", 1972], [373, "To Be or Not to Be", 1942], [374, "Blow-Up", 1966], [375, "Annie Hall", 1977], [376, "Before Midnight", 2013], [377, "Picnic at Hanging Rock", 1975], [378, "Ida", 2013], [379, "An Elephant Sitting Still", 2018], [380, "The Wizard of Oz", 1939], [381, "Raise the Red Lantern", 1991], [382, "Flowers of Shanghai", 1998], [383, "Journey to Italy", 1954], [384, "Army of Shadows", 1969], [385, "The Color of Pomegranates", 1969], [386, "The Thing", 1982], [387, "Manchester by the Sea", 2016], [388, "Blade Runner 2049", 2017], [389, "Michael Clayton", 2007], [390, "Mission: Impossible – Fallout", 2018], [391, "Phantom Thread", 2017], [392, "About Elly", 2009], [393, "Secret Sunshine", 2007], [394, "War and Peace", 1966], [395, "The Long Goodbye", 1973], [396, "I'm Still Here", 2024], [397, "And Life Goes On", 1992], [398, "Vagabond", 1985], [399, "Rocco and His Brothers", 1960], [400, "The Terrorizers", 1986], [401, "Wallace & Gromit: The Wrong Trousers", 1993], [402, "Past Lives", 2023], [403, "A Prophet", 2009], [404, "The Royal Tenenbaums", 2001], [405, "The Deer Hunter", 1978], [406, "The Wind Will Carry Us", 1999], [407, "The Power of the Dog", 2021], [408, "Dog Day Afternoon", 1975], [409, "Safe", 1995], [410, "Bonnie and Clyde", 1967], [411, "Toy Story 3", 2010], [412, "Inside Out", 2015], [413, "Los Olvidados", 1950], [414, "Beauty and the Beast", 1991], [415, "Cairo Station", 1958], [416, "The Insider", 1999], [417, "Brief Encounter", 1945], [418, "Diary of a Country Priest", 1951], [419, "Cold War", 2018], [420, "Twin Peaks: Fire Walk with Me", 1992], [421, "Tampopo", 1985], [422, "On the Waterfront", 1954], [423, "Mother India", 1957], [424, "The Brutalist", 2024], [425, "Umberto D.", 1952], [426, "Pickpocket", 1959], [427, "Viridiana", 1961], [428, "L'Eclisse", 1962], [429, "F for Fake", 1973], [430, "Tár", 2022], [431, "The Death of Mr. Lazarescu", 2005], [432, "Marketa Lazarová", 1967], [433, "Tokyo Godfathers", 2003], [434, "Pierrot le Fou", 1965], [435, "La Strada", 1954], [436, "The Irishman", 2019], [437, "Nights of Cabiria", 1957], [438, "Through the Olive Trees", 1994], [439, "Days and Nights in the Forest", 1970], [440, "The Passenger", 1975], [441, "Mean Streets", 1973], [442, "Inside Llewyn Davis", 2013], [443, "Boyhood", 2014], [444, "Jaane Bhi Do Yaaro", 1983], [445, "Peppermint Candy", 1999], [446, "Monster", 2023], [447, "Rome, Open City", 1945], [448, "The Umbrellas of Cherbourg", 1964], [449, "The Tree of Wooden Clogs", 1978], [450, "The Vanishing", 1988], [451, "Eraserhead", 1977], [452, "The Sacrifice", 1986], [453, "Mother", 2009], [454, "The Wind Rises", 2013], [455, "Hard Boiled", 1992], [456, "Dersu Uzala", 1975], [457, "Red Beard", 1965], [458, "Bringing Up Baby", 1938], [459, "Toy Story 2", 1999], [460, "Crimes and Misdemeanors", 1989], [461, "The Big City", 1963], [462, "Brazil", 1985], [463, "Mishima: A Life in Four Chapters", 1985], [464, "Le Cercle Rouge", 1970], [465, "Moolaadé", 2004], [466, "The Wailing", 2016], [467, "The Bridge on the River Kwai", 1957], [468, "Story of the Last Chrysanthemums", 1939], [469, "The Earrings of Madame de...", 1953], [470, "La Notte", 1961], [471, "Last Year at Marienbad", 1961], [472, "The Exterminating Angel", 1962], [473, "Fitzcarraldo", 1982], [474, "Close Encounters of the Third Kind", 1977], [475, "Floating Clouds", 1955], [476, "Casino Royale", 2006], [477, "Paprika", 2006], [478, "Vivre Sa Vie", 1962], [479, "Synecdoche, New York", 2008], [480, "The Puppetmaster", 1993], [481, "A Moment of Innocence", 1996], [482, "Central Station", 1998], [483, "Still Life", 2006], [484, "Nostalgia for the Light", 2010], [485, "Vengeance Is Mine", 1979], [486, "L'Argent", 1983], [487, "Amarcord", 1973], [488, "Garm Hava", 1973], [489, "Anora", 2024], [490, "Fantasia", 1940], [491, "The Texas Chain Saw Massacre", 1974], [492, "Rosemary's Baby", 1968], [493, "The Shop Around the Corner", 1940], [494, "Ghatashraddha", 1977], [495, "Piravi", 1989], [496, "Lost in Translation", 2003], [497, "La Grande Illusion", 1937], [498, "What's Opera, Doc?", 1957], [499, "Blow Out", 1981], [500, "Le Trou", 1960], [501, "How to Train Your Dragon", 2010], [502, "Guide", 1965], [503, "Black God, White Devil", 1964], [504, "Infernal Affairs", 2002], [505, "Cabaret", 1972], [506, "The Man Without a Past", 2002], [507, "Happy Hour", 2015], [508, "Only Angels Have Wings", 1939], [509, "His Girl Friday", 1940], [510, "The Cranes Are Flying", 1957], [511, "The Best Years of Our Lives", 1946], [512, "The Long Day Closes", 1992], [513, "Naked", 1993], [514, "El Sur", 1983], [515, "Fallen Angels", 1995], [516, "Aaranya Kaandam", 2010], [517, "Out of the Past", 1947], [518, "Koyaanisqatsi", 1982], [519, "Devils on the Doorstep", 2000], [520, "Timbuktu", 2014], [521, "Quo Vadis, Aida?", 2020], [522, "Deewaar", 1975], [523, "Belle de Jour", 1967], [524, "Au Revoir les Enfants", 1987], [525, "The Circle", 2000], [526, "Her", 2013], [527, "Only Yesterday", 1991], [528, "For Sama", 2019], [529, "A Short Film About Killing", 1988], [530, "My Darling Clementine", 1946], [531, "Samurai Rebellion", 1967], [532, "The Elephant Man", 1980], [533, "The Disciple", 2020], [534, "Skyfall", 2012], [535, "Dunkirk", 2017], [536, "Red Desert", 1964], [537, "Jules and Jim", 1962], [538, "The Exorcist", 1973], [539, "The Time to Live and the Time to Die", 1985], [540, "Goodbye, Dragon Inn", 2003], [541, "Zama", 2017], [542, "The Discreet Charm of the Bourgeoisie", 1972], [543, "The Celebration", 1998], [544, "Les Diaboliques", 1955], [545, "First Reformed", 2017], [546, "The Father", 2020], [547, "Kadaisi Vivasayi", 2021], [548, "The Last Picture Show", 1971], [549, "Finding Nemo", 2003], [550, "Vanaprastham", 1999], [551, "Gertrud", 1964], [552, "Duck Amuck", 1953], [553, "Halloween", 1978], [554, "Punch-Drunk Love", 2002], [555, "Kagemusha", 1980], [556, "The Ballad of Narayama", 1983], [557, "The Night of Counting the Years", 1969], [558, "Logan", 2017], [559, "The Best of Youth", 2003], [560, "Syndromes and a Century", 2006], [561, "The Turin Horse", 2011], [562, "Vidheyan", 1994], [563, "Breaking the Waves", 1996], [564, "Snow White and the Seven Dwarfs", 1937], [565, "All the President's Men", 1976], [566, "Everything Everywhere All at Once", 2022], [567, "Walkabout", 1971], [568, "After Life", 1998], [569, "Himala", 1982], [570, "The Sweet Hereafter", 1997], [571, "Rocky", 1976], [572, "Dead Man", 1995], [573, "Leviathan", 2014], [574, "The Manchurian Candidate", 1962], [575, "A Matter of Life and Death", 1946], [576, "Winter Light", 1963], [577, "Rosetta", 1999], [578, "Up", 2009], [579, "Volver", 2006], [580, "The Innocents", 1961], [581, "Do Bigha Zamin", 1953], [582, "Thampu", 1978], [583, "Whisper of the Heart", 1995], [584, "The Diving Bell and the Butterfly", 2007], [585, "I Am Not Your Negro", 2016], [586, "Stagecoach", 1939], [587, "Magnolia", 1999], [588, "Wallace & Gromit: A Close Shave", 1995], [589, "Maheshinte Prathikaaram", 2016], [590, "I Am Cuba", 1964], [591, "Dear Zachary: A Letter to a Son About His Father", 2008], [592, "Trainspotting", 1996], [593, "The Treasure of the Sierra Madre", 1948], [594, "The Worst Person in the World", 2021], [595, "Floating Weeds", 1959], [596, "Howards End", 1992], [597, "The Return", 2003], [598, "The Remains of the Day", 1993], [599, "Ace in the Hole", 1951], [600, "Opening Night", 1977], [601, "The Banshees of Inisherin", 2022], [602, "Atanarjuat: The Fast Runner", 2001], [603, "A Sun", 2019], [604, "Paisan", 1946], [605, "Spring in a Small Town", 1948], [606, "Peeping Tom", 1960], [607, "Sorcerer", 1977], [608, "Being John Malkovich", 1999], [609, "The Killer", 1989], [610, "Phoenix", 2014], [611, "Out of Sight", 1998], [612, "Dune", 2021], [613, "Son of Saul", 2015], [614, "Yavanika", 1982], [615, "Maborosi", 1995], [616, "Kannathil Muthamittal", 2002], [617, "Koozhangal", 2021], [618, "Insiang", 1976], [619, "Pixote", 1980], [620, "Castle in the Sky", 1986], [621, "Ee.Ma.Yau.", 2018], [622, "The Seed of the Sacred Fig", 2024], [623, "The Lady Eve", 1941], [624, "The King of Comedy", 1982], [625, "Spotlight", 2015], [626, "The Florida Project", 2017], [627, "Manhattan", 1979], [628, "Monsters, Inc.", 2001], [629, "Spider-Man 2", 2004], [630, "The Holdovers", 2023], [631, "Perfect Days", 2023], [632, "Kwaidan", 1964], [633, "Rififi", 1955], [634, "Autumn Sonata", 1978], [635, "Love Streams", 1984], [636, "Close Your Eyes", 2023], [637, "La Chimera", 2023], [638, "Sunrise: A Song of Two Humans", 1927], [639, "3 Women", 1977], [640, "Lone Star", 1996], [641, "Nidhanaya", 1972], [642, "The Magnificent Ambersons", 1942], [643, "Ashes and Diamonds", 1958], [644, "Eternity and a Day", 1998], [645, "In the Name of the Father", 1993], [646, "Monty Python's Life of Brian", 1979], [647, "Anantaram", 1987], [648, "Oasis", 2002], [649, "Nobody Knows", 2004], [650, "Nostalghia", 1983], [651, "Devi", 1960], [652, "Lucía", 1968], [653, "Thithi", 2015], [654, "Drive", 2011], [655, "Margaret", 2011], [656, "Who's Afraid of Virginia Woolf?", 1966], [657, "The Assassin", 2015], [658, "Coco", 2017], [659, "The Marriage of Maria Braun", 1979], [660, "Days of Being Wild", 1990], [661, "Amores Perros", 2000], [662, "Certified Copy", 2010], [663, "Oslo, August 31st", 2011], [664, "The Great Beauty", 2013], [665, "Pale Flower", 1964], [666, "Ivan the Terrible, Part II: The Boyars' Plot", 1958], [667, "Mayabazar", 1957], [668, "All That Breathes", 2022], [669, "Nickel Boys", 2024], [670, "Planet of the Apes", 1968], [671, "Senna", 2010], [672, "Fandry", 2013], [673, "Call Me by Your Name", 2017], [674, "120 BPM (Beats per Minute)", 2017], [675, "About Dry Grasses", 2023], [676, "The Passion of Joan of Arc", 1928], [677, "Germany, Year Zero", 1948], [678, "Taipei Story", 1985], [679, "Bashu, the Little Stranger", 1989], [680, "The White Balloon", 1995], [681, "Persepolis", 2007], [682, "The Headless Woman", 2008], [683, "The Hunt", 2012], [684, "The Servant", 1963], [685, "Sankarabharanam", 1980], [686, "Mukhamukham", 1984], [687, "Shadows of Forgotten Ancestors", 1965], [688, "Police Story", 1985], [689, "Eat Drink Man Woman", 1994], [690, "Sullivan's Travels", 1941], [691, "Baraka", 1992], [692, "First Cow", 2019], [693, "Shadow of a Doubt", 1943], [694, "The Souvenir Part II", 2021], [695, "Strangers on a Train", 1951], [696, "Adaptation.", 2002], [697, "Ratcatcher", 1999], [698, "Wheel of Fortune and Fantasy", 2021], [699, "Hana-bi", 1997], [700, "Sanjuro", 1962], [701, "Mysteries of Lisbon", 2010], [702, "Flow", 2024], [703, "Night of the Living Dead", 1968], [704, "Johnny Guitar", 1954], [705, "No Bears", 2022], [706, "Virumaandi", 2004], [707, "The Red Balloon", 1956], [708, "Amma Ariyan", 1986], [709, "Kiki's Delivery Service", 1989], [710, "Mathilukal", 1989], [711, "Father and Daughter", 2000], [712, "A Silent Voice", 2016], [713, "The Boy and the Heron", 2023], [714, "Trenque Lauquen", 2022], [715, "Imitation of Life", 1959], [716, "Harvest: 3,000 Years", 1976], [717, "Ceddo", 1977], [718, "Awaara", 1951], [719, "Monty Python and the Holy Grail", 1975], [720, "Jigarthanda", 2014], [721, "Angamaly Diaries", 2017], [722, "The Maltese Falcon", 1941], [723, "Jackie Brown", 1997], [724, "Who Framed Roger Rabbit", 1988], [725, "The Gospel According to St. Matthew", 1964], [726, "Yellow Earth", 1984], [727, "The Green Ray", 1986], [728, "Merry Christmas, Mr. Lawrence", 1983], [729, "The Face of Another", 1966], [730, "Investigation of a Citizen Above Suspicion", 1970], [731, "Day for Night", 1973], [732, "Mullum Malarum", 1978], [733, "In This Corner of the World", 2016], [734, "Look Back", 2024], [735, "Letter from an Unknown Woman", 1948], [736, "The Graduate", 1967], [737, "The Age of Innocence", 1993], [738, "Crumb", 1994], [739, "The Salesman", 2016], [740, "So Long, My Son", 2019], [741, "Losing Ground", 1982], [742, "Rushmore", 1998], [743, "If....", 1968], [744, "Xala", 1975], [745, "Hyenas", 1992], [746, "Ulysses' Gaze", 1995], [747, "Holy Motors", 2012], [748, "Embrace of the Serpent", 2015], [749, "Akaler Sandhane", 1980], [750, "Chidambaram", 1985], [751, "Thalapathi", 1991], [752, "Mouchette", 1967], [753, "Offside", 2006], [754, "The Last Emperor", 1987], [755, "Far from Heaven", 2002], [756, "The Souvenir", 2019], [757, "Midnight Cowboy", 1969], [758, "Evil Dead II", 1987], [759, "The Sixth Sense", 1999], [760, "The Hurt Locker", 2008], [761, "Birdman or (The Unexpected Virtue of Ignorance)", 2014], [762, "When a Woman Ascends the Stairs", 1960], [763, "Onibaba", 1964], [764, "Fish Tank", 2009], [765, "Fantastic Planet", 1973], [766, "Cría Cuervos", 1976], [767, "A Special Day", 1977], [768, "Aval Appadithan", 1978], [769, "Vera Drake", 2004], [770, "Good Morning", 1959], [771, "Local Hero", 1983], [772, "Marriage Story", 2019], [773, "The Killing", 1956], [774, "Landscape in the Mist", 1988], [775, "Happy as Lazzaro", 2018], [776, "Oru Vadakkan Veeragatha", 1989], [777, "Sarpatta Parambarai", 2021], [778, "Make Way for Tomorrow", 1937], [779, "Vive L'Amour", 1994], [780, "In Bruges", 2008], [781, "Sahib Bibi Aur Ghulam", 1962], [782, "Porco Rosso", 1992], [783, "Thondimuthalum Driksakshiyum", 2017], [784, "The Favourite", 2018], [785, "All of Us Strangers", 2023], [786, "Silent Light", 2007], [787, "Hard to Be a God", 2013], [788, "A History of Violence", 2005], [789, "Hot Fuzz", 2007], [790, "The Chaser", 2008], [791, "Gravity", 2013], [792, "A Streetcar Named Desire", 1951], [793, "Minari", 2020], [794, "The Hour of the Furnaces", 1968], [795, "La La Land", 2016], [796, "Soleil Ô", 1970], [797, "The Son", 2002], [798, "Petite Maman", 2021], [799, "Fires on the Plain", 1959], [800, "The Bad Sleep Well", 1960], [801, "Lost Highway", 1997], [802, "Swayamvaram", 1972], [803, "To Kill a Mockingbird", 1962], [804, "Tabarana Kathe", 1986], [805, "The Land", 1969], [806, "The Nightmare Before Christmas", 1993], [807, "Harold and Maude", 1971], [808, "Paper Moon", 1973], [809, "Down by Law", 1986], [810, "Samskara", 1970], [811, "The King and the Mockingbird", 1980], [812, "Dust in the Wind", 1986], [813, "The Man Who Planted Trees", 1987], [814, "A Short Film About Love", 1988], [815, "Let the Right One In", 2008], [816, "Pain and Glory", 2019], [817, "Wolfwalkers", 2020], [818, "Flee", 2021], [819, "Entranced Earth", 1967], [820, "Performance", 1970], [821, "Ardh Satya", 1983], [822, "Lessons of Darkness", 1992], [823, "Dweepa", 2002], [824, "The Disappearance of Haruhi Suzumiya", 2010], [825, "Ship of Theseus", 2012], [826, "Killa", 2014], [827, "Nanpakal Nerathu Mayakkam", 2022], [828, "West Side Story", 1961], [829, "The Triplets of Belleville", 2003], [830, "The French Connection", 1971], [831, "Grizzly Man", 2005], [832, "A Serious Man", 2009], [833, "Coraline", 2009], [834, "Silence", 2016], [835, "The Rider", 2017], [836, "If Beale Street Could Talk", 2018], [837, "Little Women", 2019], [838, "Hannah and Her Sisters", 1986], [839, "The Fugitive", 1993], [840, "John Wick: Chapter 4", 2023], [841, "Salaam Bombay!", 1988], [842, "Hunger", 2008], [843, "Guillermo del Toro's Pinocchio", 2022], [844, "2046", 2004], [845, "The Cow", 1969], [846, "Day of Wrath", 1943], [847, "Three Colors: White", 1994], [848, "Distant Thunder", 1973], [849, "La Belle Noiseuse", 1991], [850, "Song of the Sea", 2014], [851, "Anatomy of a Murder", 1959], [852, "Camp de Thiaroye", 1988], [853, "Incendies", 2010], [854, "Loveless", 2017], [855, "The Woman Who Left", 2016], [856, "Ivan's Childhood", 1962], [857, "Wendy and Lucy", 2008], [858, "Killers of the Flower Moon", 2023], [859, "Aimless Bullet", 1961], [860, "Komal Gandhar", 1961], [861, "Hey Ram", 2000], [862, "The Twilight Samurai", 2002], [863, "Spring, Summer, Fall, Winter... and Spring", 2003], [864, "Harry Potter and the Prisoner of Azkaban", 2004], [865, "Howl's Moving Castle", 2004], [866, "Wolf Children", 2012], [867, "The Lunchbox", 2013], [868, "House of Hummingbird", 2018], [869, "The First Slam Dunk", 2022], [870, "Aattam", 2023], [871, "Evil Does Not Exist", 2023], [872, "The Enigma of Kaspar Hauser", 1974], [873, "Suzhou River", 2000], [874, "All That Heaven Allows", 1955], [875, "Nomadland", 2020], [876, "From Russia with Love", 1963], [877, "Pushpaka Vimana", 1987], [878, "Patlabor 2: The Movie", 1993], [879, "Anbe Sivam", 2003], [880, "One Froggy Evening", 1955], [881, "Leave No Trace", 2018], [882, "Soul", 2020], [883, "Thelma & Louise", 1991], [884, "Traffic", 2000], [885, "Mon Oncle", 1958], [886, "The Match Factory Girl", 1990], [887, "La Promesse", 1996], [888, "Colossal Youth", 2006], [889, "Two Days, One Night", 2014], [890, "The River", 1951], [891, "The Hidden Fortress", 1958], [892, "Mr. Klein", 1976], [893, "Anhey Ghode Da Daan", 2011], [894, "The Killing of a Chinese Bookie", 1976], [895, "Dazed and Confused", 1993], [896, "Fantastic Mr. Fox", 2009], [897, "The Band Wagon", 1953], [898, "Uthiripookkal", 1979], [899, "Veedu", 1988], [900, "Aadukalam", 2011], [901, "The Promised Land", 1975], [902, "The Raid 2", 2014], [903, "The Parallax View", 1974], [904, "Poor Things", 2023], [905, "Red Sorghum", 1987], [906, "The Wedding Banquet", 1993], [907, "A.I. Artificial Intelligence", 2001], [908, "Dawn of the Planet of the Apes", 2014], [909, "Mad Max 2", 1981], [910, "The Blue Kite", 1993], [911, "The Scent of Green Papaya", 1993], [912, "In the Heat of the Sun", 1994], [913, "Songs from the Second Floor", 2000], [914, "Distant", 2002], [915, "Russian Ark", 2002], [916, "Melancholia", 2011], [917, "Nishant", 1975], [918, "Umbartha", 1982], [919, "My Left Foot", 1989], [920, "Bandit Queen", 1994], [921, "The Girl Who Leapt Through Time", 2006], [922, "Tokyo Sonata", 2008], [923, "Like Father, Like Son", 2013], [924, "Anand", 1971], [925, "Drifting Clouds", 1996], [926, "Wild Tales", 2014], [927, "The Beasts", 2022], [928, "Monsoon Wedding", 2001], [929, "Ed Wood", 1994], [930, "The Fog of War", 2003], [931, "Paterson", 2016], [932, "Lady Bird", 2017], [933, "Summer of Soul (...Or, When the Revolution Could Not Be Televised)", 2021], [934, "Top Gun: Maverick", 2022], [935, "The Big Sleep", 1946], [936, "Orlando", 1992], [937, "On Becoming a Guinea Fowl", 2024], [938, "Uncut Gems", 2019], [939, "Roman Holiday", 1953], [940, "The Bourne Ultimatum", 2007], [941, "Black Swan", 2010], [942, "Sicario", 2015], [943, "Gomorrah", 2008], [944, "Ballad of a Soldier", 1959], [945, "The Wind That Shakes the Barley", 2006], [946, "Chronicle of the Years of Fire", 1975], [947, "Cyclo", 1995], [948, "Vitalina Varela", 2019], [949, "The Quiet Girl", 2022], [950, "Faces", 1968], [951, "Seconds", 1966], [952, "Thief", 1981], [953, "Crimson Gold", 2003], [954, "Battles Without Honor and Humanity", 1973], [955, "Kammatipaadam", 2016], [956, "Merku Thodarchi Malai", 2018], [957, "Viduthalai Part 1", 2023], [958, "Broadcast News", 1987], [959, "My Night at Maud's", 1969], [960, "The Philadelphia Story", 1940], [961, "L'Enfant", 2005], [962, "Taxi", 2015], [963, "Kanchana Sita", 1977], [964, "Dawn of the Dead", 1978], [965, "Morvern Callar", 2002], [966, "The Great Indian Kitchen", 2021], [967, "Mommy", 2014], [968, "Bacurau", 2019], [969, "Paradise Lost: The Child Murders at Robin Hood Hills", 1996], [970, "Barton Fink", 1991], [971, "The Prince of Egypt", 1998], [972, "Sagara Sangamam", 1983], [973, "Searching for Sugar Man", 2012], [974, "1987: When the Day Comes", 2017], [975, "Ajantrik", 1958], [976, "The Hustler", 1961], [977, "Witness for the Prosecution", 1957], [978, "Scream", 1996], [979, "The Silences of the Palace", 1994], [980, "Enter the Dragon", 1973], [981, "Indiana Jones and the Last Crusade", 1989], [982, "Master and Commander: The Far Side of the World", 2003], [983, "Mandabi", 1968], [984, "The Bitter Tears of Petra von Kant", 1972], [985, "An Angel at My Table", 1990], [986, "The Burmese Harp", 1956], [987, "45 Years", 2015], [988, "Withnail and I", 1987], [989, "Kind Hearts and Coronets", 1949], [990, "I Vitelloni", 1953], [991, "La Cérémonie", 1995], [992, "Revanche", 2008], [993, "RoboCop", 1987], [994, "Certain Women", 2016], [995, "Nirmalyam", 1973], [996, "The Wild Pear Tree", 2018], [997, "Klute", 1971], [998, "After Hours", 1985], [999, "The Son's Room", 2001], [1000, "Before the Rain", 1994]];
+const RAW_SERIES = [[1, "Breaking Bad", 2008], [2, "The Wire", 2002], [3, "The Sopranos", 1999], [4, "Chernobyl", 2019], [5, "Band of Brothers", 2001], [6, "Better Call Saul", 2015], [7, "Game of Thrones", 2011], [8, "Succession", 2018], [9, "True Detective", 2014], [10, "Avatar: The Last Airbender", 2005], [11, "Fargo", 2014], [12, "Mad Men", 2007], [13, "Attack on Titan", 2013], [14, "Fullmetal Alchemist: Brotherhood", 2009], [15, "Death Note", 2006], [16, "Monster", 2004], [17, "Cowboy Bebop", 1998], [18, "Hunter x Hunter", 2011], [19, "Steins;Gate", 2011], [20, "Frieren: Beyond Journey's End", 2023], [21, "Vinland Saga", 2019], [22, "Neon Genesis Evangelion", 1995], [23, "Legend of the Galactic Heroes", 1988], [24, "One Piece", 1999], [25, "Dragon Ball Z", 1989], [26, "Naruto: Shippuden", 2007], [27, "Dark", 2017], [28, "Mindhunter", 2017], [29, "Sherlock", 2010], [30, "Peaky Blinders", 2013], [31, "Narcos", 2015], [32, "Mr. Robot", 2015], [33, "Black Mirror", 2011], [34, "Severance", 2022], [35, "The Last of Us", 2023], [36, "Shōgun", 2024], [37, "Arcane", 2021], [38, "Stranger Things", 2016], [39, "The Boys", 2019], [40, "The Mandalorian", 2019], [41, "Andor", 2022], [42, "House of the Dragon", 2022], [43, "The Crown", 2016], [44, "Downton Abbey", 2010], [45, "Fleabag", 2016], [46, "Ted Lasso", 2020], [47, "The Bear", 2022], [48, "The Office (US)", 2005], [49, "Friends", 1994], [50, "Seinfeld", 1989], [51, "Arrested Development", 2003], [52, "Parks and Recreation", 2009], [53, "Brooklyn Nine-Nine", 2013], [54, "Modern Family", 2009], [55, "Curb Your Enthusiasm", 2000], [56, "It's Always Sunny in Philadelphia", 2005], [57, "The Simpsons", 1989], [58, "BoJack Horseman", 2014], [59, "Rick and Morty", 2013], [60, "South Park", 1997], [61, "Twin Peaks", 1990], [62, "The Twilight Zone", 1959], [63, "The X-Files", 1993], [64, "Lost", 2004], [65, "Prison Break", 2005], [66, "Dexter", 2006], [67, "House", 2004], [68, "24", 2001], [69, "Suits", 2011], [70, "Money Heist", 2017], [71, "Squid Game", 2021], [72, "Reply 1988", 2015], [73, "My Mister", 2018], [74, "Kingdom", 2019], [75, "Crash Landing on You", 2019], [76, "Signal", 2016], [77, "Stranger", 2017], [78, "Moving", 2023], [79, "All of Us Are Dead", 2022], [80, "Scam 1992: The Harshad Mehta Story", 2020], [81, "Panchayat", 2020], [82, "Sacred Games", 2018], [83, "Paatal Lok", 2020], [84, "The Family Man", 2019], [85, "Mirzapur", 2018], [86, "Gullak", 2019], [87, "Kota Factory", 2019], [88, "Aspirants", 2021], [89, "Delhi Crime", 2019], [90, "Farzi", 2023], [91, "Rocket Boys", 2022], [92, "Jubilee", 2023], [93, "Kohrra", 2023], [94, "Kaala Pani", 2023], [95, "Tabbar", 2021], [96, "Asur", 2020], [97, "Special Ops", 2020], [98, "Breathe", 2018], [99, "Criminal Justice", 2019], [100, "Bandish Bandits", 2020], [101, "Made in Heaven", 2019], [102, "Pitchers", 2015], [103, "Malgudi Days", 1986], [104, "Sarabhai vs Sarabhai", 2004], [105, "Mahabharat", 1988], [106, "Ramayan", 1987], [107, "Bharat Ek Khoj", 1988], [108, "Deadwood", 2004], [109, "The Leftovers", 2014], [110, "Six Feet Under", 2001], [111, "Dekalog", 1989], [112, "The Singing Detective", 1986], [113, "Planet Earth II", 2016], [114, "The Office", 2001], [115, "The Americans", 2013], [116, "Scenes from a Marriage", 1973], [117, "Batman: The Animated Series", 1992], [118, "Berlin Alexanderplatz", 1980], [119, "Planet Earth", 2006], [120, "I, Claudius", 1976], [121, "Monty Python's Flying Circus", 1969], [122, "Atlanta", 2016], [123, "Cosmos: A Personal Voyage", 1980], [124, "The Shield", 2002], [125, "Lonesome Dove", 1989], [126, "Battlestar Galactica", 2004], [127, "Fawlty Towers", 1975], [128, "The Larry Sanders Show", 1992], [129, "Angels in America", 2003], [130, "Edge of Darkness", 1985], [131, "I May Destroy You", 2020], [132, "Happy Valley", 2014], [133, "Freaks and Geeks", 1999], [134, "The Last Dance", 2020], [135, "Blue Planet II", 2017], [136, "Eyes on the Prize", 1987], [137, "Star Trek: The Next Generation", 1987], [138, "Small Axe", 2020], [139, "Mr. Sunshine", 2018], [140, "Halt and Catch Fire", 2014], [141, "Tinker Tailor Soldier Spy", 1979], [142, "Ping Pong the Animation", 2014], [143, "The Long Season", 2023], [144, "Heimat", 1984], [145, "The Bureau", 2015], [146, "Star Trek: Deep Space Nine", 1993], [147, "The West Wing", 1999], [148, "M*A*S*H", 1972], [149, "Shouwa Genroku Rakugo Shinjuu", 2016], [150, "Civilisation", 1969], [151, "Our Friends in the North", 1996], [152, "Pachinko", 2022], [153, "Station Eleven", 2021], [154, "Veep", 2012], [155, "Rectify", 2013], [156, "Blackadder", 1983], [157, "Peep Show", 2003], [158, "Mushishi", 2005], [159, "Wolf Hall", 2015], [160, "Mob Psycho 100", 2016], [161, "My Brilliant Friend", 2018], [162, "I'm Alan Partridge", 1997], [163, "Slow Horses", 2022], [164, "The Expanse", 2015], [165, "Cheers", 1982], [166, "Ming Dynasty in 1566", 2007], [167, "Tengen Toppa Gurren Lagann", 2007], [168, "The Underground Railroad", 2021], [169, "Ways of Seeing", 1972], [170, "The Jinx: The Life and Deaths of Robert Durst", 2015], [171, "I Love Lucy", 1951], [172, "All in the Family", 1971], [173, "Watchmen", 2019], [174, "Buffy the Vampire Slayer", 1997], [175, "Yes Minister", 1980], [176, "March Comes in Like a Lion", 2016], [177, "Over the Garden Wall", 2014], [178, "Ashita no Joe", 1970], [179, "Brideshead Revisited", 1981], [180, "Generation Kill", 2008], [181, "The Beatles: Get Back", 2021], [182, "The Mary Tyler Moore Show", 1970], [183, "Roots", 1977], [184, "Futurama", 1999], [185, "Justified", 2010], [186, "Gravity Falls", 2012], [187, "Nathan for You", 2013], [188, "Sandglass", 1995], [189, "Code Geass: Lelouch of the Rebellion", 2006], [190, "Gintama", 2006], [191, "Blue Eye Samurai", 2023], [192, "The Ascent of Man", 1973], [193, "The Thick of It", 2005], [194, "The Tatami Galaxy", 2010], [195, "Anthony Bourdain: Parts Unknown", 2013], [196, "Chappelle's Show", 2003], [197, "Tamas", 1988], [198, "Berserk", 1997], [199, "It's a Sin", 2021], [200, "Towards the Republic", 2003], [201, "The Blue Planet", 2001], [202, "Boys from the Blackstuff", 1982], [203, "Pluto", 2023], [204, "How To with John Wilson", 2020], [205, "Baseball", 1994], [206, "Oshin", 1983], [207, "Revolutionary Girl Utena", 1997], [208, "Ghost in the Shell: Stand Alone Complex", 2002], [209, "30 Rock", 2006], [210, "Friday Night Lights", 2006], [211, "Samurai Jack", 2001], [212, "Hacks", 2021], [213, "Puella Magi Madoka Magica", 2011], [214, "Babylon Berlin", 2017], [215, "Barry", 2018], [216, "Pride and Prejudice", 1995], [217, "Matador", 1978], [218, "Odd Taxi", 2021], [219, "Homicide: Life on the Street", 1993], [220, "The White Lotus", 2021], [221, "Scavengers Reign", 2023], [222, "Reservation Dogs", 2021], [223, "The Office", 2005], [224, "Hill Street Blues", 1981], [225, "Tiger & Dragon", 2005], [226, "Nirvana in Fire", 2015], [227, "Prime Suspect", 1991], [228, "The Prisoner", 1967], [229, "Pennies from Heaven", 1978], [230, "Smiley's People", 1982], [231, "Borgen", 2010], [232, "Frasier", 1993], [233, "Line of Duty", 2012], [234, "Rome", 2005], [235, "FLCL", 2000], [236, "Frozen Planet", 2011], [237, "Hannibal", 2013], [238, "Columbo", 1971], [239, "Beyond Evil", 2021], [240, "Detectorists", 2014], [241, "Misaeng: Incomplete Life", 2014], [242, "The Bridge", 2011], [243, "The People v. O. J. Simpson: American Crime Story", 2016], [244, "When They See Us", 2019], [245, "Mare of Easttown", 2021], [246, "Doctor Who", 2005], [247, "Rebooting", 2023], [248, "Taxi", 1978], [249, "Cracker", 1993], [250, "Utopia", 2013], [251, "Pantheon", 2022], [252, "Mobile Suit Gundam", 1979], [253, "Giri/Haji", 2019], [254, "The Knick", 2014], [255, "Slam Dunk", 1993], [256, "Los Simuladores", 2002], [257, "Mr Inbetween", 2018], [258, "Person of Interest", 2011], [259, "Somebody Somewhere", 2022], [260, "Connections", 1978], [261, "Only Fools and Horses", 1981], [262, "Mirza Ghalib", 1988], [263, "Father Ted", 1995], [264, "Serial Experiments Lain", 1998], [265, "Samurai Champloo", 2004], [266, "Inside No. 9", 2014], [267, "The Corner", 2000], [268, "The Pacific", 2010], [269, "Olive Kitteridge", 2014], [270, "The Queen's Gambit", 2020], [271, "Beef", 2023], [272, "State of Play", 2003], [273, "Prison Playbook", 2017], [274, "Kaguya-sama: Love Is War", 2019], [275, "The Wonder Years", 1988], [276, "Malcolm in the Middle", 2000], [277, "Daredevil", 2015], [278, "Dear My Friends", 2016], [279, "The Muppet Show", 1976], [280, "The Jewel in the Crown", 1984], [281, "Our Planet", 2019], [282, "Nana", 2006], [283, "Playhouse 90", 1956], [284, "The Good Place", 2016], [285, "The Haunting of Hill House", 2018], [286, "The Dick Van Dyke Show", 1961], [287, "Yu Yu Hakusho", 1992], [288, "Six Flying Dragons", 2015], [289, "Boardwalk Empire", 2010], [290, "Black Sails", 2014], [291, "Brass Eye", 1997], [292, "The Story of Film: An Odyssey", 2011], [293, "The Bad Kids", 2020], [294, "The Long Night", 2020], [295, "John Adams", 2008], [296, "Adventure Time", 2010], [297, "The Night Of", 2016], [298, "Amachan", 2013], [299, "Bocchi the Rock!", 2022], [300, "Star Trek", 1966]];
+const CURATED_META = {"m_1": {"dir": "Francis Ford Coppola", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "175m", "desc": "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant youngest son, Michael Corleone."}, "m_2": {"dir": "Frank Darabont", "country": "USA", "lang": "English", "genre": "Drama", "runtime": "142m", "desc": "Over the course of several years, two convicts form a friendship, seeking consolation and, eventually, redemption through basic compassion."}, "m_3": {"dir": "Francis Ford Coppola", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "202m", "desc": "The early life and career of Vito Corleone in 1920s New York City is portrayed, while his son, Michael, expands and tightens his grip on the family crime syndicate."}, "m_4": {"dir": "Akira Kurosawa", "country": "Japan", "lang": "Japanese", "genre": "Action, Drama", "runtime": "207m", "desc": "Farmers from a village exploited by bandits hire a veteran samurai for protection, who gathers six other samurai to join him."}, "m_5": {"dir": "Christopher Nolan", "country": "USA / UK", "lang": "English", "genre": "Action, Crime, Drama", "runtime": "152m", "desc": "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice."}, "m_6": {"dir": "Sidney Lumet", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "96m", "desc": "The jury in a New York City murder trial is frustrated by a single member whose skeptical caution forces them to more carefully consider the evidence before jumping to a hasty verdict."}, "m_7": {"dir": "Steven Spielberg", "country": "USA", "lang": "English", "genre": "Biography, Drama, History", "runtime": "195m", "desc": "In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis."}, "m_8": {"dir": "Quentin Tarantino", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "154m", "desc": "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption."}, "m_9": {"dir": "Peter Jackson", "country": "New Zealand / USA", "lang": "English", "genre": "Adventure, Fantasy", "runtime": "201m", "desc": "Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring."}, "m_10": {"dir": "Sergio Leone", "country": "Italy / Spain", "lang": "Italian / English", "genre": "Western", "runtime": "178m", "desc": "A bounty hunting scam joins two men in an uneasy alliance against a third in a race to find a fortune in gold buried in a remote cemetery."}, "m_11": {"dir": "Peter Jackson", "country": "New Zealand / USA", "lang": "English", "genre": "Adventure, Fantasy", "runtime": "178m", "desc": "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth from the Dark Lord Sauron."}, "m_12": {"dir": "Hayao Miyazaki", "country": "Japan", "lang": "Japanese", "genre": "Animation, Fantasy", "runtime": "125m", "desc": "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, where humans are changed into beasts."}, "m_13": {"dir": "Bong Joon-ho", "country": "South Korea", "lang": "Korean", "genre": "Drama, Thriller", "runtime": "132m", "desc": "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan."}, "m_14": {"dir": "Martin Scorsese", "country": "USA", "lang": "English", "genre": "Biography, Crime, Drama", "runtime": "145m", "desc": "The story of Henry Hill and his life in the mafia, covering his relationship with his wife Karen and his mob partners Jimmy Conway and Tommy DeVito."}, "m_15": {"dir": "Masaki Kobayashi", "country": "Japan", "lang": "Japanese", "genre": "Action, Drama, Mystery", "runtime": "133m", "desc": "When a ronin requesting seppuku at a feudal lord's palace is told of the brutal suicide of another ronin who previously visited, he reveals how their pasts are intertwined."}, "m_16": {"dir": "Satyajit Ray", "country": "India", "lang": "Bengali", "genre": "Drama", "runtime": "125m", "desc": "Impoverished priest Harihar Ray, dreaming of a better life for himself and his family, leaves his rural Bengal village in search of work."}, "m_19": {"dir": "Christopher Nolan", "country": "USA / UK", "lang": "English", "genre": "Action, Sci-Fi, Thriller", "runtime": "148m", "desc": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O."}, "m_20": {"dir": "David Fincher", "country": "USA", "lang": "English", "genre": "Drama", "runtime": "139m", "desc": "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more."}, "m_23": {"dir": "Christopher Nolan", "country": "USA / UK", "lang": "English", "genre": "Adventure, Drama, Sci-Fi", "runtime": "169m", "desc": "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans."}, "m_134": {"dir": "Ramesh Sippy", "country": "India", "lang": "Hindi", "genre": "Action, Adventure, Drama", "runtime": "204m", "desc": "After his family is murdered by a notorious and ruthless bandit, a former police officer enlists the services of two outlaws to capture him."}, "m_142": {"dir": "Anurag Kashyap", "country": "India", "lang": "Hindi", "genre": "Action, Crime, Drama", "runtime": "321m", "desc": "A clash between Sultan and Shahid Khan leads to the expulsion of Khan from Wasseypur, and ignites a deadly blood feud spanning three generations."}, "m_146": {"dir": "Rajkumar Hirani", "country": "India", "lang": "Hindi", "genre": "Comedy, Drama", "runtime": "170m", "desc": "Two friends are searching for their long lost companion. They revisit their college days and recall the memories of their friend who inspired them to think differently."}, "m_150": {"dir": "Nitesh Tiwari", "country": "India", "lang": "Hindi", "genre": "Action, Biography, Drama", "runtime": "161m", "desc": "Former wrestler Mahavir Singh Phogat and his two wrestler daughters struggle towards glory at the Commonwealth Games in the face of societal oppression."}, "m_156": {"dir": "Rahi Anil Barve", "country": "India", "lang": "Hindi", "genre": "Drama, Fantasy, Horror", "runtime": "104m", "desc": "A mythological story about a goddess who created the entire universe. The plot revolves around the consequences when humans build a temple for her first-born, Hastar."}, "m_188": {"dir": "Vidhu Vinod Chopra", "country": "India", "lang": "Hindi", "genre": "Biography, Drama", "runtime": "147m", "desc": "Based on the true story of IPS officer Manoj Kumar Sharma and IRS officer Shraddha Joshi, charting a fearless journey of restarting from zero."}, "m_235": {"dir": "Christopher Nolan", "country": "USA / UK", "lang": "English", "genre": "Biography, Drama, History", "runtime": "180m", "desc": "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II."}, "s_1": {"dir": "Vince Gilligan", "country": "USA", "lang": "English", "genre": "Crime, Drama, Thriller", "runtime": "5 Seasons (62 eps)", "desc": "A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student in order to secure his family's future."}, "s_2": {"dir": "David Simon", "country": "USA", "lang": "English", "genre": "Crime, Drama, Thriller", "runtime": "5 Seasons (60 eps)", "desc": "The Baltimore drug scene, as seen through the eyes of drug dealers and law enforcement officers across the city's institutions."}, "s_3": {"dir": "David Chase", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "6 Seasons (86 eps)", "desc": "New Jersey mob boss Tony Soprano deals with personal and professional issues in his home and business life that affect his mental state, leading him to seek professional psychiatric counseling."}, "s_4": {"dir": "Craig Mazin", "country": "USA / UK", "lang": "English", "genre": "Drama, History, Thriller", "runtime": "Miniseries (5 eps)", "desc": "In April 1986, an explosion at the Chernobyl nuclear power plant in the Union of Soviet Socialist Republics becomes one of the world's worst man-made catastrophes."}, "s_5": {"dir": "Steven Spielberg, Tom Hanks", "country": "USA / UK", "lang": "English", "genre": "Drama, History, War", "runtime": "Miniseries (10 eps)", "desc": "The story of Easy Company of the U.S. Army 101st Airborne Division and their mission in World War II Europe, from Operation Overlord to V-J Day."}, "s_6": {"dir": "Vince Gilligan, Peter Gould", "country": "USA", "lang": "English", "genre": "Crime, Drama", "runtime": "6 Seasons (63 eps)", "desc": "The trials and tribulations of criminal lawyer Jimmy McGill in the years leading up to his fateful run-in with Walter White and Jesse Pinkman."}, "s_7": {"dir": "David Benioff, D. B. Weiss", "country": "USA", "lang": "English", "genre": "Action, Adventure, Drama", "runtime": "8 Seasons (73 eps)", "desc": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia."}, "s_8": {"dir": "Jesse Armstrong", "country": "USA", "lang": "English", "genre": "Comedy, Drama", "runtime": "4 Seasons (39 eps)", "desc": "The Roy family is known for controlling the biggest media and entertainment company in the world. However, their world changes when their father steps down from the company."}, "s_9": {"dir": "Nic Pizzolatto", "country": "USA", "lang": "English", "genre": "Crime, Drama, Mystery", "runtime": "Anthology Series", "desc": "Anthology series in which police investigations unearth the personal and professional secrets of those involved, both within and outside the law."}, "s_13": {"dir": "Hajime Isayama", "country": "Japan", "lang": "Japanese", "genre": "Animation, Action, Drama", "runtime": "4 Seasons (94 eps)", "desc": "After his hometown is destroyed and his mother is killed, young Eren Jaeger vows to cleanse the earth of the giant humanoid Titans that have brought humanity to the brink of extinction."}, "s_14": {"dir": "Yasuhiro Irie", "country": "Japan", "lang": "Japanese", "genre": "Animation, Action, Adventure", "runtime": "64 Episodes", "desc": "Two brothers search for a Philosopher's Stone after an attempt to revive their deceased mother goes awry and leaves them in damaged physical forms."}, "s_15": {"dir": "Tetsurō Araki", "country": "Japan", "lang": "Japanese", "genre": "Animation, Crime, Drama", "runtime": "37 Episodes", "desc": "An intelligent high school student goes on a secret crusade to eliminate criminals from the world after discovering a notebook capable of killing anyone whose name is written into it."}, "s_16": {"dir": "Masayuki Kojima", "country": "Japan", "lang": "Japanese", "genre": "Animation, Crime, Drama", "runtime": "74 Episodes", "desc": "Tenma, a brilliant neurosurgeon with a promising future, risks his career to save the life of a critically wounded young boy — who grows up to become a charismatic sociopath."}, "s_19": {"dir": "Hiroshi Hamasaki", "country": "Japan", "lang": "Japanese", "genre": "Animation, Sci-Fi, Thriller", "runtime": "24 Episodes", "desc": "After discovering time travel, a university student and his colleagues must use their knowledge of it to stop an evil organization and their diabolical plans."}, "s_21": {"dir": "Shūhei Yabuta", "country": "Japan", "lang": "Japanese", "genre": "Animation, Action, Drama", "runtime": "2 Seasons (48 eps)", "desc": "Thorfinn pursues a journey with his father's killer in order to take revenge and end his life in a duel as an honorable warrior."}, "s_27": {"dir": "Baran bo Odar, Jantje Friese", "country": "Germany", "lang": "German", "genre": "Crime, Drama, Mystery", "runtime": "3 Seasons (26 eps)", "desc": "A family saga with a supernatural twist, set in a German town where the disappearance of two young children exposes the relationships among four families."}, "s_28": {"dir": "Joe Penhall, David Fincher", "country": "USA", "lang": "English", "genre": "Crime, Drama, Thriller", "runtime": "2 Seasons (19 eps)", "desc": "In the late 1970s, two FBI agents are tasked with interviewing serial killers to solve open cases by developing psychological profiling."}, "s_29": {"dir": "Mark Gatiss, Steven Moffat", "country": "UK", "lang": "English", "genre": "Crime, Drama, Mystery", "runtime": "4 Seasons (13 eps)", "desc": "A modern update finds the famous sleuth and his doctor partner solving crime in 21st-century London."}, "s_30": {"dir": "Steven Knight", "country": "UK", "lang": "English", "genre": "Crime, Drama", "runtime": "6 Seasons (36 eps)", "desc": "A gangster family epic set in 1900s England, centering on a gang who sew razor blades in the peaks of their caps, and their fierce boss Tommy Shelby."}, "s_32": {"dir": "Sam Esmail", "country": "USA", "lang": "English", "genre": "Crime, Drama, Thriller", "runtime": "4 Seasons (45 eps)", "desc": "Elliot, a brilliant but highly unstable young cyber-security engineer and vigilante hacker, becomes a key figure in a complex game of global dominance."}, "s_33": {"dir": "Charlie Brooker", "country": "UK / USA", "lang": "English", "genre": "Drama, Sci-Fi, Thriller", "runtime": "Anthology Series", "desc": "Featuring stand-alone dramas — sharp, suspenseful, satirical tales that explore techno-paranoia and the unintended consequences of modern society."}, "s_34": {"dir": "Dan Erickson, Ben Stiller", "country": "USA", "lang": "English", "genre": "Drama, Mystery, Sci-Fi", "runtime": "Sci-Fi Thriller", "desc": "Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives."}, "s_47": {"dir": "Christopher Storer", "country": "USA", "lang": "English", "genre": "Comedy, Drama", "runtime": "3+ Seasons", "desc": "A young chef from the fine dining world returns to Chicago to run his family's sandwich shop."}, "s_80": {"dir": "Hansal Mehta", "country": "India", "lang": "Hindi", "genre": "Biography, Crime, Drama", "runtime": "Miniseries (10 eps)", "desc": "Set in 1980s and '90s Bombay, it follows the life of Harshad Mehta, a stockbroker who took the stock market to dizzying heights and his catastrophic downfall."}, "s_81": {"dir": "Deepak Kumar Mishra", "country": "India", "lang": "Hindi", "genre": "Comedy, Drama", "runtime": "3+ Seasons", "desc": "A comedy-drama, which captures the journey of an engineering graduate Abhishek, who for lack of a better job option joins as secretary of a Panchayat office in a remote village of Uttar Pradesh."}};
+  </script>
+
+  <!-- Application Logic -->
+  <script>
+    (function () {
+      const STORAGE_USER_KEY = 'cinema_master_user_state_v1';
+      const STORAGE_META_KEY = 'cinema_master_meta_cache_v3';
+      const PAGE_SIZE = 60;
+      const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
+      const MAX_NOTE_LENGTH = 2000;
+      const ALLOWED_STATUSES = new Set(['unwatched', 'watched', 'watching', 'bookmarked']);
+      const RETRY_COOLDOWN_MS = 10 * 60 * 1000;
+
+      const FEATURED_REEL_IDS = ['m_1', 'm_4', 'm_12', 'm_13', 'm_16', 'm_33', 'm_44', 's_1', 's_2', 's_4', 'm_146', 'm_156'];
+
+      const TIERS = [
+        { id: 'm1', type: 'movie', min: 1, max: 150, label: 'Movies 1 to 150: Absolute Masterpieces' },
+        { id: 'm2', type: 'movie', min: 151, max: 350, label: 'Movies 151 to 350: World & Indian Classics' },
+        { id: 'm3', type: 'movie', min: 351, max: 600, label: 'Movies 351 to 600: Thrillers, Sci-Fi & Drama' },
+        { id: 'm4', type: 'movie', min: 601, max: 800, label: 'Movies 601 to 800: Crowd-Pleasers & Blockbusters' },
+        { id: 'm5', type: 'movie', min: 801, max: 1000, label: 'Movies 801 to 1,000: Time-Pass Entertainers' },
+        { id: 's1', type: 'series', min: 1, max: 50, label: 'Series 1 to 50: All-Time Series' },
+        { id: 's2', type: 'series', min: 51, max: 120, label: 'Series 51 to 120: Global, Anime & Indian Series' },
+        { id: 's3', type: 'series', min: 121, max: 200, label: 'Series 121 to 200: Crime, Sci-Fi & Sitcoms' },
+        { id: 's4', type: 'series', min: 201, max: 250, label: 'Series 201 to 250: Gripping Crowd-Pleasers' },
+        { id: 's5', type: 'series', min: 251, max: 300, label: 'Series 251 to 300: Comfort Binge Series' },
+      ];
+
+      function getTier(type, rank) {
+        return TIERS.find(t => t.type === type && rank >= t.min && rank <= t.max) || TIERS[0];
+      }
+
+      const ALL_ITEMS = [
+        ...RAW_MOVIES.map(([rank, title, year]) => ({ id: 'm_' + rank, type: 'movie', rank, title, year, tier: getTier('movie', rank) })),
+        ...RAW_SERIES.map(([rank, title, year]) => ({ id: 's_' + rank, type: 'series', rank, title, year, tier: getTier('series', rank) }))
+      ];
+      const ITEM_MAP = new Map(ALL_ITEMS.map(item => [item.id, item]));
+
+      let userState = {};
+      let metaCache = {};
+      let pendingImportData = null;
+      let previousUserStateSnapshot = null;
+      let lastFocusedEl = null;
+
+      const state = {
+        view: 'collection',
+        mode: 'grid', // grid | shelf | orb
+        type: 'all',
+        search: '',
+        status: 'all',
+        tier: 'all',
+        decade: 'all',
+        sort: 'rank-asc',
+        page: 1,
+        activeModalId: null,
+        confirmResetPending: false,
+      };
+
+      function isValidHttpsUrl(str) {
+        if (!str || typeof str !== 'string') return false;
+        const t = str.trim();
+        if (t.length > 1000) return false;
+        try { return new URL(t).protocol === 'https:'; } catch { return false; }
+      }
+
+      function sanitizeUserState(rawObj) {
+        if (!rawObj || typeof rawObj !== 'object' || Array.isArray(rawObj)) return { clean: null, validCount: 0, skippedCount: 0 };
+        const clean = {};
+        let validCount = 0, skippedCount = 0;
+        for (const [id, entry] of Object.entries(rawObj)) {
+          if (!ITEM_MAP.has(id) || !entry || typeof entry !== 'object' || Array.isArray(entry)) { skippedCount++; continue; }
+          const status = ALLOWED_STATUSES.has(entry.status) ? entry.status : 'unwatched';
+          const rNum = Number(entry.rating);
+          const rating = Number.isInteger(rNum) && rNum >= 0 && rNum <= 10 ? rNum : 0;
+          const notes = typeof entry.notes === 'string' ? entry.notes.slice(0, MAX_NOTE_LENGTH) : '';
+          const customPoster = isValidHttpsUrl(entry.customPoster) ? entry.customPoster.trim() : '';
+          if (status !== 'unwatched' || rating > 0 || notes || customPoster) {
+            clean[id] = { status, rating, notes, customPoster };
+            validCount++;
+          }
+        }
+        return { clean, validCount, skippedCount };
+      }
+
+      function showStorageWarning() { document.getElementById('storageWarning').classList.remove('hidden'); }
+
+      function loadStorage() {
+        try {
+          const u = localStorage.getItem(STORAGE_USER_KEY);
+          if (u) { const { clean } = sanitizeUserState(JSON.parse(u)); if (clean) userState = clean; }
+        } catch { showStorageWarning(); }
+        try {
+          const m = localStorage.getItem(STORAGE_META_KEY);
+          if (m) { const p = JSON.parse(m); if (p && typeof p === 'object' && !Array.isArray(p)) metaCache = p; }
+        } catch {}
+      }
+
+      function saveUserState() {
+        try { localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(userState)); }
+        catch { showStorageWarning(); showToast('Storage restricted. Export a JSON backup.'); }
+      }
+
+      function saveMetaCache() {
+        try {
+          const keys = Object.keys(metaCache);
+          if (keys.length > 750) for (let i = 0; i < 150; i++) delete metaCache[keys[i]];
+          localStorage.setItem(STORAGE_META_KEY, JSON.stringify(metaCache));
+        } catch { try { metaCache = {}; localStorage.removeItem(STORAGE_META_KEY); } catch {} }
+      }
+
+      function getUserEntry(id) { return userState[id] || { status: 'unwatched', rating: 0, notes: '', customPoster: '' }; }
+
+      function setUserEntry(id, patch) {
+        const next = { ...getUserEntry(id), ...patch };
+        if (next.status === 'unwatched' && !next.rating && !next.notes && !next.customPoster) delete userState[id];
+        else userState[id] = next;
+        saveUserState();
+        updateProgressUI();
+        if (state.view === 'stats') renderStatsView();
+      }
+
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.add('hidden'), 3000);
+      }
+
+      // Metadata Queue
+      const fetchQueue = [];
+      let activeFetches = 0;
+      const MAX_CONCURRENT = 6;
+      const inFlight = new Set();
+
+      function needsFetch(id) {
+        const c = metaCache[id];
+        if (!c) return true;
+        if (c.poster || c.desc) return false;
+        if (c.failedAt && (Date.now() - c.failedAt) < RETRY_COOLDOWN_MS) return false;
+        return true;
+      }
+
+      function enqueueMetadataFetch(item, priority = false) {
+        if (!needsFetch(item.id) || inFlight.has(item.id)) return;
+        inFlight.add(item.id);
+        if (priority) fetchQueue.unshift(item);
+        else fetchQueue.push(item);
+        pumpQueue();
+      }
+
+      function pumpQueue() {
+        while (activeFetches < MAX_CONCURRENT && fetchQueue.length > 0) {
+          const item = fetchQueue.shift();
+          activeFetches++;
+          fetchItemMetadata(item).catch(() => {}).finally(() => {
+            activeFetches--;
+            inFlight.delete(item.id);
+            pumpQueue();
+          });
+        }
+      }
+
+      function cleanHtml(s) { return s ? s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : ''; }
+      function normalizeTitle(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+      async function fetchWithTimeout(url, ms = 6500) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), ms);
+        try {
+          const res = await fetch(url, { signal: ctrl.signal });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return await res.json();
+        } finally { clearTimeout(timer); }
+      }
+
+      async function fetchWikipediaData(item, query) {
+        const url = 'https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=' +
+          encodeURIComponent(query) +
+          '&gsrlimit=5&prop=pageimages|extracts|info&inprop=url&piprop=thumbnail&pithumbsize=500&pilicense=any&exintro=1&explaintext=1&exsentences=3&format=json&origin=*';
+        const data = await fetchWithTimeout(url);
+        if (!data || !data.query || !data.query.pages) return null;
+        const normTarget = normalizeTitle(item.title);
+        const yearStr = String(item.year);
+        const mediaWords = item.type === 'movie' ? ['film', 'movie'] : ['series', 'television', 'tv', 'miniseries', 'anime'];
+        const scored = Object.values(data.query.pages).map(p => {
+          let score = 0;
+          const pTitle = normalizeTitle(p.title);
+          const pExt = (p.extract || '').toLowerCase();
+          if (pTitle.includes(normTarget) || normTarget.includes(pTitle)) score += 4;
+          if ((p.title || '').includes(yearStr) || pExt.includes(yearStr)) score += 3;
+          if (mediaWords.some(w => pExt.includes(w) || (p.title || '').toLowerCase().includes(w))) score += 2;
+          if (p.thumbnail && isValidHttpsUrl(p.thumbnail.source)) score += 1;
+          return { page: p, score };
+        }).sort((a, b) => b.score - a.score || (a.page.index || 99) - (b.page.index || 99));
+        const best = scored[0];
+        if (!best || best.score < 4) return null;
+        const p = best.page;
+        return {
+          poster: (p.thumbnail && isValidHttpsUrl(p.thumbnail.source)) ? p.thumbnail.source : '',
+          desc: p.extract || '',
+          wikiUrl: isValidHttpsUrl(p.fullurl) ? p.fullurl : ('https://en.wikipedia.org/wiki/' + encodeURIComponent(p.title.replace(/ /g, '_')))
+        };
+      }
+
+      async function fetchItunesPoster(title, year) {
+        const url = 'https://itunes.apple.com/search?term=' + encodeURIComponent(title) + '&media=movie&limit=8';
+        const data = await fetchWithTimeout(url);
+        if (!data || !Array.isArray(data.results)) return null;
+        const norm = normalizeTitle(title);
+        const match = data.results.find(r => {
+          const rName = normalizeTitle(r.trackName);
+          const rYear = r.releaseDate ? parseInt(r.releaseDate.slice(0, 4), 10) : 0;
+          return rName && (rName === norm || rName.includes(norm) || norm.includes(rName)) && rYear > 0 && Math.abs(rYear - year) <= 2;
+        });
+        if (match && isValidHttpsUrl(match.artworkUrl100)) {
+          return {
+            poster: match.artworkUrl100.replace('100x100bb', '600x600bb'),
+            desc: match.longDescription || match.shortDescription || '',
+            genre: match.primaryGenreName || ''
+          };
+        }
+        return null;
+      }
+
+      async function fetchTvmazeData(title, year) {
+        const url = 'https://api.tvmaze.com/search/shows?q=' + encodeURIComponent(title);
+        const data = await fetchWithTimeout(url);
+        if (!Array.isArray(data) || data.length === 0) return null;
+        const norm = normalizeTitle(title);
+        let best = data.find(e => {
+          const s = e.show;
+          if (!s || !s.name) return false;
+          const sn = normalizeTitle(s.name);
+          const sy = s.premiered ? parseInt(s.premiered.slice(0, 4), 10) : 0;
+          return (sn === norm || sn.includes(norm) || norm.includes(sn)) && sy > 0 && Math.abs(sy - year) <= 2;
+        }) || data.find(e => e.show && normalizeTitle(e.show.name) === norm);
+        if (!best || !best.show) return null;
+        const s = best.show;
+        const rawImg = s.image ? (s.image.medium || s.image.original || '').replace(/^http:/, 'https:') : '';
+        return {
+          poster: isValidHttpsUrl(rawImg) ? rawImg : '',
+          desc: cleanHtml(s.summary),
+          genre: Array.isArray(s.genres) ? s.genres.join(', ') : '',
+          network: (s.network && s.network.name) || (s.webChannel && s.webChannel.name) || '',
+          runtime: s.averageRuntime ? s.averageRuntime + ' min per episode' : ''
+        };
+      }
+
+      async function fetchItemMetadata(item) {
+        const curated = CURATED_META[item.id] || {};
+        let result = {
+          poster: '', desc: curated.desc || '', genre: curated.genre || '', dir: curated.dir || '',
+          country: curated.country || '', lang: curated.lang || '', runtime: curated.runtime || '',
+          network: '', wikiUrl: 'https://en.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(item.title + ' ' + item.year),
+          fetched: false, failedAt: 0
+        };
+        try {
+          if (item.type === 'series') {
+            const tv = await fetchTvmazeData(item.title, item.year).catch(() => null);
+            if (tv) {
+              if (tv.poster) result.poster = tv.poster;
+              if (!result.desc && tv.desc) result.desc = tv.desc;
+              if (!result.genre && tv.genre) result.genre = tv.genre;
+              if (tv.network) result.network = tv.network;
+              if (!result.runtime && tv.runtime) result.runtime = tv.runtime;
+            }
+            if (!result.poster || !result.desc) {
+              const w = await fetchWikipediaData(item, item.title + ' ' + item.year + ' television series').catch(() => null)
+                || await fetchWikipediaData(item, item.title + ' TV series').catch(() => null);
+              if (w) { if (!result.poster && w.poster) result.poster = w.poster; if (!result.desc && w.desc) result.desc = w.desc; if (w.wikiUrl) result.wikiUrl = w.wikiUrl; }
+            }
+          } else {
+            const w = await fetchWikipediaData(item, item.title + ' ' + item.year + ' film').catch(() => null)
+              || await fetchWikipediaData(item, item.title + ' film').catch(() => null);
+            if (w) { if (w.poster) result.poster = w.poster; if (!result.desc && w.desc) result.desc = w.desc; if (w.wikiUrl) result.wikiUrl = w.wikiUrl; }
+            if (!result.poster) {
+              const it = await fetchItunesPoster(item.title, item.year).catch(() => null);
+              if (it) { if (it.poster) result.poster = it.poster; if (!result.desc && it.desc) result.desc = it.desc; if (!result.genre && it.genre) result.genre = it.genre; }
+            }
+          }
+        } catch {}
+        if (result.poster || result.desc) result.fetched = true;
+        else result.failedAt = Date.now();
+        metaCache[item.id] = result;
+        saveMetaCache();
+        updateAllPosterInstances(item.id);
+        if (state.activeModalId === item.id) populateModalMetadata(item);
+      }
+
+      function updateAllPosterInstances(id) {
+        const user = getUserEntry(id);
+        const meta = metaCache[id] || {};
+        const posterUrl = (user.customPoster && isValidHttpsUrl(user.customPoster))
+          ? user.customPoster : (meta.poster && isValidHttpsUrl(meta.poster) ? meta.poster : '');
+
+        document.querySelectorAll('[data-card-id="' + id + '"], [data-reel-id="' + id + '"]').forEach(el => {
+          const img = el.querySelector('.card-poster-img');
+          const fb = el.querySelector('.card-poster-fallback');
+          if (posterUrl && img) {
+            img.onload = () => { img.classList.remove('opacity-0'); if (fb) fb.classList.add('hidden'); };
+            img.onerror = () => { img.classList.add('opacity-0'); if (fb) fb.classList.remove('hidden'); };
+            img.src = posterUrl;
+            if (img.complete && img.naturalWidth > 0) { img.classList.remove('opacity-0'); if (fb) fb.classList.add('hidden'); }
+          }
+          const g = el.querySelector('.card-genre');
+          if (g && (meta.genre || (CURATED_META[id] && CURATED_META[id].genre))) {
+            g.textContent = meta.genre || CURATED_META[id].genre;
+          }
+        });
+      }
+
+      // Filmstrip Rendering & Drag Inertia
+      function renderFilmstrip() {
+        const track = document.getElementById('filmstripTrack');
+        track.innerHTML = '';
+        FEATURED_REEL_IDS.forEach(id => {
+          const item = ITEM_MAP.get(id);
+          if (!item) return;
+          const user = getUserEntry(id);
+          const meta = metaCache[id] || {};
+          const posterUrl = (user.customPoster && isValidHttpsUrl(user.customPoster))
+            ? user.customPoster : (meta.poster && isValidHttpsUrl(meta.poster) ? meta.poster : '');
+
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.setAttribute('data-reel-id', id);
+          tile.className = 'group shrink-0 w-32 sm:w-36 text-left cursor-pointer scroll-snap-align-start';
+
+          const frame = document.createElement('div');
+          frame.className = 'poster-frame relative w-full overflow-hidden group-hover:border-brass transition-colors';
+
+          const img = document.createElement('img');
+          img.className = `card-poster-img absolute inset-0 w-full h-full object-cover ${posterUrl ? '' : 'opacity-0'}`;
+          img.alt = `${item.title} (${item.year}) poster`;
+          img.referrerPolicy = 'no-referrer';
+          if (posterUrl) img.src = posterUrl;
+
+          const fb = document.createElement('div');
+          fb.className = `card-poster-fallback relative z-10 w-full h-full flex flex-col justify-between p-2.5 bg-surface ${posterUrl ? 'hidden' : ''}`;
+          const t1 = document.createElement('div');
+          t1.className = 'text-[11px] text-brass font-medium';
+          t1.textContent = '#' + item.rank;
+          const t2 = document.createElement('div');
+          t2.className = 'font-serif text-xs font-semibold text-ink line-clamp-3';
+          t2.textContent = item.title;
+          const t3 = document.createElement('div');
+          t3.className = 'text-[11px] text-muted';
+          t3.textContent = String(item.year);
+          fb.append(t1, t2, t3);
+
+          frame.append(img, fb);
+
+          const caption = document.createElement('div');
+          caption.className = 'pt-2';
+          const title = document.createElement('div');
+          title.className = 'text-xs font-medium text-ink truncate group-hover:text-brass';
+          title.textContent = item.title;
+          const sub = document.createElement('div');
+          sub.className = 'text-[11px] text-muted';
+          sub.textContent = `#${item.rank} · ${item.year}`;
+          caption.append(title, sub);
+
+          tile.append(frame, caption);
+          tile.addEventListener('click', () => openDetailModal(id));
+          track.appendChild(tile);
+
+          if (!posterUrl && needsFetch(id)) enqueueMetadataFetch(item, true);
+        });
+      }
+
+      // Filmstrip drag scrolling
+      (function wireFilmstripControls() {
+        const track = document.getElementById('filmstripTrack');
+        let isDown = false, startX = 0, scrollLeft = 0;
+        track.addEventListener('mousedown', e => { isDown = true; track.classList.add('dragging'); startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft; });
+        track.addEventListener('mouseleave', () => { isDown = false; track.classList.remove('dragging'); });
+        track.addEventListener('mouseup', () => { isDown = false; track.classList.remove('dragging'); });
+        track.addEventListener('mousemove', e => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - track.offsetLeft;
+          track.scrollLeft = scrollLeft - (x - startX) * 1.4;
+        });
+        document.getElementById('btnStripPrev').addEventListener('click', () => track.scrollBy({ left: -340, behavior: 'smooth' }));
+        document.getElementById('btnStripNext').addEventListener('click', () => track.scrollBy({ left: 340, behavior: 'smooth' }));
+      })();
+
+      // ==================== THREE.JS 3D ARCHIVE ORB ====================
+      let orbState = null;
+
+      function disposeOrb() {
+        if (!orbState) return;
+        cancelAnimationFrame(orbState.raf);
+        window.removeEventListener('resize', orbState.onResize);
+        orbState.renderer.dispose();
+        orbState.geometries.forEach(g => g.dispose());
+        orbState.materials.forEach(m => m.dispose());
+        orbState.textures.forEach(t => t.dispose());
+        const host = document.getElementById('orbCanvasHost');
+        host.innerHTML = '';
+        orbState = null;
+      }
+
+      function createPlateCanvasTexture(item, isWatched) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 384;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1B1C19';
+        ctx.fillRect(0, 0, 256, 384);
+        ctx.strokeStyle = isWatched ? '#5D8A66' : '#B89A62';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(4, 4, 248, 376);
+        ctx.fillStyle = '#B89A62';
+        ctx.font = '600 20px Inter, sans-serif';
+        ctx.fillText('#' + item.rank + ' · ' + item.year, 20, 44);
+        ctx.fillStyle = '#F2F0E9';
+        ctx.font = '600 24px Georgia, serif';
+        const words = item.title.split(' ');
+        let line = '', y = 140;
+        for (const w of words) {
+          const test = line ? line + ' ' + w : w;
+          if (ctx.measureText(test).width > 216 && line) {
+            ctx.fillText(line, 20, y);
+            line = w;
+            y += 32;
+            if (y > 280) break;
+          } else line = test;
+        }
+        if (line && y <= 280) ctx.fillText(line, 20, y);
+        ctx.fillStyle = isWatched ? '#5D8A66' : '#A6A49B';
+        ctx.font = '500 16px Inter, sans-serif';
+        ctx.fillText(isWatched ? 'WATCHED' : (item.type === 'movie' ? 'FILM' : 'SERIES'), 20, 350);
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      function mountOrbView(items) {
+        disposeOrb();
+        const host = document.getElementById('orbCanvasHost');
+        if (typeof THREE === 'undefined') {
+          host.innerHTML = '<div class="p-8 text-sm text-secondary text-center">WebGL 3D library unavailable offline. Switch to Grid or Shelf view.</div>';
+          return;
+        }
+        let renderer;
+        try {
+          renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        } catch {
+          host.innerHTML = '<div class="p-8 text-sm text-secondary text-center">WebGL is unavailable in this browser. Switch to Grid or Shelf view.</div>';
+          return;
+        }
+
+        const w = host.clientWidth || 800;
+        const h = host.clientHeight || 540;
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setClearColor(0x111210, 1);
+        host.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(48, w / h, 0.1, 100);
+        camera.position.z = 11.5;
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const slice = items.slice(0, 48);
+        const count = slice.length;
+        const radius = 4.8;
+        const geometries = [];
+        const materials = [];
+        const textures = [];
+        const meshes = [];
+        const geom = new THREE.PlaneGeometry(0.95, 1.42);
+        geometries.push(geom);
+
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        slice.forEach((item, i) => {
+          const y = 1 - (i / Math.max(1, count - 1)) * 2;
+          const r = Math.sqrt(Math.max(0, 1 - y * y));
+          const theta = goldenAngle * i;
+          const x = Math.cos(theta) * r;
+          const z = Math.sin(theta) * r;
+
+          const isWatched = getUserEntry(item.id).status === 'watched';
+          const tex = createPlateCanvasTexture(item, isWatched);
+          textures.push(tex);
+          const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+          materials.push(mat);
+
+          const mesh = new THREE.Mesh(geom, mat);
+          mesh.position.set(x * radius, y * radius, z * radius);
+          mesh.lookAt(x * radius * 2, y * radius * 2, z * radius * 2);
+          mesh.userData = { item, basePos: mesh.position.clone() };
+          group.add(mesh);
+          meshes.push(mesh);
+        });
+
+        let isDragging = false, prevX = 0, prevY = 0, velX = 0.0022, velY = 0, moved = false;
+        let hoveredMesh = null;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) velX = 0;
+
+        const dom = renderer.domElement;
+        dom.addEventListener('pointerdown', e => { isDragging = true; moved = false; prevX = e.clientX; prevY = e.clientY; });
+        dom.addEventListener('pointerup', () => {
+          if (!moved && hoveredMesh) openDetailModal(hoveredMesh.userData.item.id);
+          isDragging = false;
+        });
+        dom.addEventListener('pointermove', e => {
+          const rect = dom.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+          if (isDragging) {
+            const dx = e.clientX - prevX;
+            const dy = e.clientY - prevY;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+            velX = dx * 0.0045;
+            velY = dy * 0.0045;
+            group.rotation.y += velX;
+            group.rotation.x = Math.max(-1.1, Math.min(1.1, group.rotation.x + velY));
+            prevX = e.clientX;
+            prevY = e.clientY;
+            return;
+          }
+
+          raycaster.setFromCamera(mouse, camera);
+          const hits = raycaster.intersectObjects(meshes);
+          hoveredMesh = hits.length ? hits[0].object : null;
+          const lbl = document.getElementById('orbHoverLabel');
+          if (hoveredMesh) {
+            const it = hoveredMesh.userData.item;
+            lbl.textContent = `#${it.rank} ${it.title} (${it.year})`;
+            dom.style.cursor = 'pointer';
+          } else {
+            lbl.textContent = 'Hover a plate to inspect';
+            dom.style.cursor = 'grab';
+          }
+        });
+        dom.addEventListener('wheel', e => {
+          e.preventDefault();
+          camera.position.z = Math.max(7.5, Math.min(16, camera.position.z + e.deltaY * 0.008));
+        }, { passive: false });
+
+        function onResize() {
+          const nw = host.clientWidth || 800;
+          const nh = host.clientHeight || 540;
+          camera.aspect = nw / nh;
+          camera.updateProjectionMatrix();
+          renderer.setSize(nw, nh);
+        }
+        window.addEventListener('resize', onResize);
+
+        let raf = 0;
+        function animate() {
+          raf = requestAnimationFrame(animate);
+          if (!isDragging) {
+            group.rotation.y += velX;
+            group.rotation.x = Math.max(-1.1, Math.min(1.1, group.rotation.x + velY));
+            velX *= 0.96;
+            velY *= 0.96;
+            if (!reducedMotion && Math.abs(velX) < 0.0012) velX = 0.0012;
+          }
+          meshes.forEach(m => {
+            const targetScale = m === hoveredMesh ? 1.18 : 1.0;
+            m.scale.x += (targetScale - m.scale.x) * 0.14;
+            m.scale.y += (targetScale - m.scale.y) * 0.14;
+          });
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        orbState = { renderer, geometries, materials, textures, onResize, get raf() { return raf; } };
+      }
+
+      // Navigation & Mode Switching
+      function switchView(targetView) {
+        state.view = targetView;
+        state.page = 1;
+        document.querySelectorAll('[data-nav]').forEach(btn => {
+          if (btn.getAttribute('data-nav') === targetView) btn.setAttribute('aria-current', 'page');
+          else btn.removeAttribute('aria-current');
+        });
+        document.getElementById('mobileNav').classList.add('hidden');
+        document.getElementById('btnMobileMenu').setAttribute('aria-expanded', 'false');
+
+        const isCatalogue = ['collection', 'movies', 'series', 'library'].includes(targetView);
+        document.getElementById('viewCatalogue').classList.toggle('hidden', !isCatalogue);
+        document.getElementById('viewStats').classList.toggle('hidden', targetView !== 'stats');
+        document.getElementById('viewBackup').classList.toggle('hidden', targetView !== 'backup');
+        document.getElementById('filmstripSection').classList.toggle('hidden', targetView !== 'collection');
+
+        if (!isCatalogue) disposeOrb();
+
+        if (targetView === 'collection') {
+          state.type = 'all';
+          if (state.status === 'library-any') state.status = 'all';
+          document.getElementById('viewEyebrow').textContent = 'Curated Lifetime Archive';
+          document.getElementById('viewHeading').textContent = 'The Ultimate Lifetime Cinema & Television Collection';
+          document.getElementById('viewSubtitle').textContent = '1,000 ranked films and 300 television series organized from all-time masterworks to comfort viewing.';
+        } else if (targetView === 'movies') {
+          state.type = 'movie';
+          if (state.status === 'library-any') state.status = 'all';
+          document.getElementById('viewEyebrow').textContent = 'Master List 1';
+          document.getElementById('viewHeading').textContent = 'Top 1,000 Movies';
+          document.getElementById('viewSubtitle').textContent = 'Ranked continuously from #1 to #1,000 across world cinema, Indian classics, and essential genre films.';
+        } else if (targetView === 'series') {
+          state.type = 'series';
+          if (state.status === 'library-any') state.status = 'all';
+          document.getElementById('viewEyebrow').textContent = 'Master List 2';
+          document.getElementById('viewHeading').textContent = 'Top 300 Television Series';
+          document.getElementById('viewSubtitle').textContent = 'Ranked continuously from #1 to #300 across prestige drama, anime, Indian series, and comedies.';
+        } else if (targetView === 'library') {
+          state.type = 'all';
+          state.status = 'library-any';
+          document.getElementById('viewEyebrow').textContent = 'Personal Viewing Log';
+          document.getElementById('viewHeading').textContent = 'My Library';
+          document.getElementById('viewSubtitle').textContent = 'Titles you have watched, started watching, bookmarked, rated, or annotated.';
+        } else if (targetView === 'stats') {
+          renderStatsView();
+        } else if (targetView === 'backup') {
+          state.confirmResetPending = false;
+          document.getElementById('btnResetProgress').textContent = 'Clear All Progress';
+          document.getElementById('importPreviewBox').classList.add('hidden');
+          pendingImportData = null;
+        }
+
+        if (isCatalogue) { syncFilterControls(); renderCatalogue(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function syncFilterControls() {
+        document.getElementById('filterType').value = state.type;
+        document.getElementById('filterStatus').value = state.status === 'library-any' ? 'all' : state.status;
+        document.getElementById('filterTier').value = state.tier;
+        document.getElementById('filterDecade').value = state.decade;
+        document.getElementById('sortBy').value = state.sort;
+      }
+
+      function getFilteredItems() {
+        const q = state.search.trim().toLowerCase();
+        const rankMatch = /^#(\d+)$/.exec(q);
+        const rankQuery = rankMatch ? parseInt(rankMatch[1], 10) : null;
+
+        let list = ALL_ITEMS.filter(item => {
+          if (state.type !== 'all' && item.type !== state.type) return false;
+          if (state.tier !== 'all' && item.tier.id !== state.tier) return false;
+          if (state.decade !== 'all') {
+            const dec = parseInt(state.decade, 10);
+            if (dec === 1930) { if (item.year >= 1940) return false; }
+            else { if (item.year < dec || item.year >= dec + 10) return false; }
+          }
+          const user = getUserEntry(item.id);
+          if (state.status === 'library-any') { if (user.status === 'unwatched' && !user.rating && !user.notes) return false; }
+          else if (state.status === 'watched' && user.status !== 'watched') return false;
+          else if (state.status === 'watching' && user.status !== 'watching') return false;
+          else if (state.status === 'bookmarked' && user.status !== 'bookmarked') return false;
+          else if (state.status === 'unwatched' && user.status !== 'unwatched') return false;
+          else if (state.status === 'not-completed' && user.status === 'watched') return false;
+          else if (state.status === 'rated' && !user.rating) return false;
+
+          if (q) {
+            if (rankQuery !== null) return item.rank === rankQuery;
+            const hay = (item.title + ' ' + item.year + ' #' + item.rank).toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          return true;
+        });
+
+        list.sort((a, b) => {
+          if (state.sort === 'rank-asc') return a.rank !== b.rank ? a.rank - b.rank : (a.type === 'movie' ? -1 : 1);
+          if (state.sort === 'rank-desc') return a.rank !== b.rank ? b.rank - a.rank : (a.type === 'movie' ? -1 : 1);
+          if (state.sort === 'year-desc') return b.year - a.year || a.rank - b.rank;
+          if (state.sort === 'year-asc') return a.year - b.year || a.rank - b.rank;
+          if (state.sort === 'title-asc') return a.title.localeCompare(b.title);
+          if (state.sort === 'rating-desc') return (getUserEntry(b.id).rating || 0) - (getUserEntry(a.id).rating || 0) || a.rank - b.rank;
+          return 0;
+        });
+        return list;
+      }
+
+      function renderActiveFilterChips() {
+        const container = document.getElementById('activeFilterChips');
+        container.innerHTML = '';
+        const chips = [];
+        if (state.type !== 'all' && state.view === 'collection') chips.push({ label: state.type === 'movie' ? 'Movies' : 'Series', clear: () => { state.type = 'all'; } });
+        if (state.status !== 'all' && state.status !== 'library-any') {
+          const labels = { unwatched: 'Unwatched', watching: 'Watching', bookmarked: 'Watchlist', watched: 'Watched', 'not-completed': 'Not Completed', rated: 'Rated' };
+          chips.push({ label: 'Status: ' + (labels[state.status] || state.status), clear: () => { state.status = state.view === 'library' ? 'library-any' : 'all'; } });
+        }
+        if (state.tier !== 'all') {
+          const t = TIERS.find(x => x.id === state.tier);
+          chips.push({ label: t ? t.label.split(':')[0] : state.tier, clear: () => { state.tier = 'all'; } });
+        }
+        if (state.decade !== 'all') chips.push({ label: state.decade === '1930' ? '1930s & Earlier' : state.decade + 's', clear: () => { state.decade = 'all'; } });
+        if (state.sort !== 'rank-asc') chips.push({ label: 'Custom Sort', clear: () => { state.sort = 'rank-asc'; } });
+
+        const badge = document.getElementById('activeFilterCount');
+        if (chips.length > 0) { badge.textContent = String(chips.length); badge.classList.remove('hidden'); }
+        else badge.classList.add('hidden');
+
+        chips.forEach(c => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-surface border border-line hover:border-brass text-ink rounded-sm cursor-pointer';
+          btn.textContent = c.label;
+          const x = document.createElement('span');
+          x.setAttribute('aria-hidden', 'true');
+          x.className = 'text-muted';
+          x.textContent = '×';
+          btn.appendChild(x);
+          btn.setAttribute('aria-label', 'Remove filter ' + c.label);
+          btn.addEventListener('click', () => { c.clear(); state.page = 1; syncFilterControls(); renderCatalogue(); });
+          container.appendChild(btn);
+        });
+        document.getElementById('btnResetFilters').classList.toggle('hidden', !(chips.length > 0 || Boolean(state.search.trim())));
+      }
+
+      let observer = null;
+      function setupObserver() {
+        if (observer) observer.disconnect();
+        observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = entry.target.getAttribute('data-card-id');
+              const item = ITEM_MAP.get(id);
+              if (item) enqueueMetadataFetch(item);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '250px' });
+      }
+
+      function buildCardElement(item) {
+        const user = getUserEntry(item.id);
+        const meta = metaCache[item.id] || {};
+        const curated = CURATED_META[item.id] || {};
+        const posterUrl = (user.customPoster && isValidHttpsUrl(user.customPoster))
+          ? user.customPoster : (meta.poster && isValidHttpsUrl(meta.poster) ? meta.poster : '');
+        const isWatched = user.status === 'watched';
+        const genreDisplay = meta.genre || curated.genre || (item.type === 'movie' ? 'Film' : 'Series');
+
+        const card = document.createElement('article');
+        card.setAttribute('data-card-id', item.id);
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `${item.title} (${item.year}), Rank #${item.rank}, status: ${user.status}`);
+        card.className = 'group flex flex-col cursor-pointer rounded-sm';
+
+        const posterWrap = document.createElement('div');
+        posterWrap.className = `poster-frame relative w-full overflow-hidden transition-colors duration-150 ${isWatched ? 'border-ok/70' : 'group-hover:border-brass'}`;
+
+        const img = document.createElement('img');
+        img.className = `card-poster-img absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${posterUrl ? '' : 'opacity-0'}`;
+        img.alt = `${item.title} (${item.year}) poster`;
+        img.referrerPolicy = 'no-referrer';
+        if (posterUrl) img.src = posterUrl;
+
+        const fallback = document.createElement('div');
+        fallback.className = `card-poster-fallback relative z-10 w-full h-full flex flex-col justify-between p-3.5 bg-surface ${posterUrl ? 'hidden' : ''}`;
+        const fbTop = document.createElement('div');
+        fbTop.className = 'flex items-center justify-between text-xs text-muted';
+        fbTop.innerHTML = `<span>${item.type === 'movie' ? 'Film' : 'Series'}</span><span>${item.year}</span>`;
+        const fbMid = document.createElement('div');
+        fbMid.className = 'my-auto py-2';
+        const fbTitle = document.createElement('div');
+        fbTitle.className = 'font-serif text-base font-semibold text-ink leading-snug line-clamp-3';
+        fbTitle.textContent = item.title;
+        fbMid.appendChild(fbTitle);
+        const fbLine = document.createElement('div');
+        fbLine.className = 'h-px w-8 bg-brass/60';
+        fallback.append(fbTop, fbMid, fbLine);
+
+        const watchBtn = document.createElement('button');
+        watchBtn.type = 'button';
+        watchBtn.setAttribute('data-action', 'toggle-watch');
+        watchBtn.setAttribute('aria-label', isWatched ? `Unmark ${item.title} as watched` : `Mark ${item.title} as watched`);
+        watchBtn.setAttribute('aria-pressed', isWatched ? 'true' : 'false');
+        watchBtn.className = `absolute top-2 right-2 z-20 w-9 h-9 rounded-sm flex items-center justify-center border transition-colors cursor-pointer ${
+          isWatched ? 'bg-ok border-ok text-bg' : 'bg-bg/80 border-line text-secondary hover:border-brass hover:text-ink'
+        }`;
+        watchBtn.innerHTML = isWatched
+          ? '<svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+          : '<svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>';
+
+        posterWrap.append(img, fallback, watchBtn);
+
+        const metaBlock = document.createElement('div');
+        metaBlock.className = 'pt-2.5 space-y-1';
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-baseline justify-between gap-2 text-xs text-muted';
+        const rankSpan = document.createElement('span');
+        rankSpan.className = 'font-medium text-brass';
+        rankSpan.textContent = '#' + item.rank;
+        const yearSpan = document.createElement('span');
+        yearSpan.textContent = String(item.year);
+        topRow.append(rankSpan, yearSpan);
+
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'text-sm font-medium text-ink leading-snug line-clamp-2 group-hover:text-brass transition-colors';
+        titleEl.textContent = item.title;
+
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'flex items-center justify-between gap-2 text-xs text-secondary';
+        const genreSpan = document.createElement('span');
+        genreSpan.className = 'card-genre truncate';
+        genreSpan.textContent = genreDisplay;
+        bottomRow.appendChild(genreSpan);
+
+        const statusParts = [];
+        if (user.status === 'watched') statusParts.push('Watched');
+        else if (user.status === 'watching') statusParts.push('Watching');
+        else if (user.status === 'bookmarked') statusParts.push('Watchlist');
+        if (user.rating > 0) statusParts.push(`${user.rating}/10`);
+        if (statusParts.length > 0) {
+          const stEl = document.createElement('span');
+          stEl.className = 'shrink-0 font-medium ' + (user.status === 'watched' ? 'text-ok' : user.status === 'watching' ? 'text-brass' : 'text-secondary');
+          stEl.textContent = statusParts.join(' · ');
+          bottomRow.appendChild(stEl);
+        }
+
+        metaBlock.append(topRow, titleEl, bottomRow);
+        card.append(posterWrap, metaBlock);
+
+        card.addEventListener('click', e => {
+          const btn = e.target.closest('[data-action="toggle-watch"]');
+          if (btn) {
+            e.stopPropagation();
+            const nextStatus = isWatched ? 'unwatched' : 'watched';
+            setUserEntry(item.id, { status: nextStatus });
+            showToast(nextStatus === 'watched' ? `Marked "${item.title}" as watched.` : `Removed watched mark for "${item.title}".`);
+            renderCatalogue();
+            return;
+          }
+          openDetailModal(item.id);
+        });
+        card.addEventListener('keydown', e => {
+          if (e.target.closest('[data-action="toggle-watch"]')) return;
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetailModal(item.id); }
+        });
+        return { card, hasPoster: Boolean(posterUrl) };
+      }
+
+      function renderCatalogue() {
+        renderActiveFilterChips();
+        const filtered = getFilteredItems();
+        const total = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        if (state.page > totalPages) state.page = totalPages;
+        const start = (state.page - 1) * PAGE_SIZE;
+        const slice = filtered.slice(start, start + PAGE_SIZE);
+
+        document.getElementById('resultCount').textContent = `Showing ${total.toLocaleString()} title${total === 1 ? '' : 's'}`;
+
+        const grid = document.getElementById('mediaGrid');
+        const orbWrap = document.getElementById('orbStageWrap');
+        const empty = document.getElementById('emptyState');
+        const pagBar = document.getElementById('paginationBar');
+
+        if (total === 0) {
+          disposeOrb();
+          grid.innerHTML = '';
+          grid.classList.add('hidden');
+          orbWrap.classList.add('hidden');
+          empty.classList.remove('hidden');
+          pagBar.classList.add('hidden');
+          return;
+        }
+
+        empty.classList.add('hidden');
+        pagBar.classList.remove('hidden');
+        document.getElementById('pageInfo').textContent = `Page ${state.page} of ${totalPages} (${start + 1} to ${Math.min(start + PAGE_SIZE, total)} of ${total.toLocaleString()})`;
+        document.getElementById('btnPrevPage').disabled = state.page <= 1;
+        document.getElementById('btnNextPage').disabled = state.page >= totalPages;
+
+        if (state.mode === 'orb') {
+          grid.classList.add('hidden');
+          orbWrap.classList.remove('hidden');
+          mountOrbView(slice);
+          return;
+        }
+
+        disposeOrb();
+        orbWrap.classList.add('hidden');
+        grid.classList.remove('hidden');
+        setupObserver();
+        grid.innerHTML = '';
+
+        if (state.mode === 'shelf') {
+          grid.className = 'space-y-4';
+          const perShelf = 5;
+          for (let i = 0; i < slice.length; i += perShelf) {
+            const row = document.createElement('div');
+            row.className = 'shelf-row grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5';
+            slice.slice(i, i + perShelf).forEach(item => {
+              const { card, hasPoster } = buildCardElement(item);
+              row.appendChild(card);
+              if (!hasPoster && needsFetch(item.id)) observer.observe(card);
+            });
+            grid.appendChild(row);
+          }
+        } else {
+          grid.className = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-5 gap-y-8';
+          const frag = document.createDocumentFragment();
+          slice.forEach(item => {
+            const { card, hasPoster } = buildCardElement(item);
+            frag.appendChild(card);
+            if (!hasPoster && needsFetch(item.id)) observer.observe(card);
+          });
+          grid.appendChild(frag);
+        }
+
+        slice.slice(0, 15).forEach(item => {
+          const user = getUserEntry(item.id);
+          if (!user.customPoster && needsFetch(item.id)) enqueueMetadataFetch(item, true);
+        });
+      }
+
+      function computeStats() {
+        let watchedMovies = 0, watchedSeries = 0, watching = 0, bookmarked = 0, rated = 0;
+        ALL_ITEMS.forEach(item => {
+          const u = getUserEntry(item.id);
+          if (u.status === 'watched') { if (item.type === 'movie') watchedMovies++; else watchedSeries++; }
+          else if (u.status === 'watching') watching++;
+          else if (u.status === 'bookmarked') bookmarked++;
+          if (u.rating > 0) rated++;
+        });
+        const totalWatched = watchedMovies + watchedSeries;
+        return { watchedMovies, watchedSeries, totalWatched, watching, bookmarked, unwatched: 1300 - totalWatched - watching - bookmarked, rated, remaining: 1300 - totalWatched };
+      }
+
+      function updateProgressUI() {
+        const s = computeStats();
+        const pct = Math.round((s.totalWatched / 1300) * 100);
+        document.getElementById('statOverallText').textContent = `${s.totalWatched.toLocaleString()} / 1,300 watched (${pct}%)`;
+        document.getElementById('statSplitText').textContent = `${s.watchedMovies} films · ${s.watchedSeries} series`;
+        document.getElementById('statOverallBar').style.width = pct + '%';
+        document.getElementById('progOverall').setAttribute('aria-valuenow', String(s.totalWatched));
+      }
+
+      function renderStatsView() {
+        const s = computeStats();
+        const summaryGrid = document.getElementById('statsSummaryGrid');
+        summaryGrid.innerHTML = '';
+        [
+          { label: 'Overall Completed', val: `${s.totalWatched.toLocaleString()} / 1,300`, sub: `${Math.round((s.totalWatched / 1300) * 100)}% of archive` },
+          { label: 'Movies Watched', val: `${s.watchedMovies.toLocaleString()} / 1,000`, sub: `${Math.round((s.watchedMovies / 1000) * 100)}% of Master List 1` },
+          { label: 'Series Watched', val: `${s.watchedSeries.toLocaleString()} / 300`, sub: `${Math.round((s.watchedSeries / 300) * 100)}% of Master List 2` },
+          { label: 'Remaining Titles', val: s.remaining.toLocaleString(), sub: `${s.rated.toLocaleString()} titles personally rated` },
+        ].forEach(m => {
+          const box = document.createElement('div');
+          box.className = 'bg-surface border border-line rounded p-4';
+          box.innerHTML = `<div class="text-xs text-secondary uppercase tracking-wider mb-1">${m.label}</div><div class="font-serif text-2xl font-semibold text-ink">${m.val}</div><div class="text-xs text-muted mt-1">${m.sub}</div>`;
+          summaryGrid.appendChild(box);
+        });
+
+        const distEl = document.getElementById('statsStatusDist');
+        distEl.innerHTML = '';
+        [
+          { label: 'Watched', count: s.totalWatched, cls: 'text-ok' },
+          { label: 'Currently Watching', count: s.watching, cls: 'text-brass' },
+          { label: 'Watchlist', count: s.bookmarked, cls: 'text-ink' },
+          { label: 'Unwatched', count: s.unwatched, cls: 'text-secondary' },
+        ].forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'bg-bg border border-line rounded p-3.5';
+          el.innerHTML = `<div class="text-xs text-secondary mb-1">${d.label}</div><div class="text-xl font-semibold ${d.cls}">${d.count.toLocaleString()}</div>`;
+          distEl.appendChild(el);
+        });
+
+        const tierList = document.getElementById('statsTierList');
+        tierList.innerHTML = '';
+        TIERS.forEach(t => {
+          const total = t.max - t.min + 1;
+          let count = 0;
+          for (let r = t.min; r <= t.max; r++) if (getUserEntry((t.type === 'movie' ? 'm_' : 's_') + r).status === 'watched') count++;
+          const pct = Math.round((count / total) * 100);
+          const row = document.createElement('div');
+          row.className = 'space-y-1.5';
+          row.innerHTML = `<div class="flex items-center justify-between text-sm gap-2"><span class="text-ink">${t.label}</span><span class="text-xs font-medium text-brass shrink-0">${count} / ${total} (${pct}%)</span></div><div class="w-full h-1.5 bg-bg rounded-sm overflow-hidden"><div class="h-full bg-brass" style="width:${pct}%"></div></div>`;
+          tierList.appendChild(row);
+        });
+      }
+
+      // Detail Modal
+      function openDetailModal(id) {
+        const item = ITEM_MAP.get(id);
+        if (!item) return;
+        lastFocusedEl = document.activeElement;
+        state.activeModalId = id;
+        const user = getUserEntry(id);
+        document.getElementById('modalRankBadge').textContent = '#' + item.rank;
+        document.getElementById('modalTypeBadge').textContent = item.type === 'movie' ? 'Movie' : 'Series';
+        document.getElementById('modalTierLabel').textContent = item.tier.label;
+        document.getElementById('modalTitle').textContent = `${item.title} (${item.year})`;
+        document.getElementById('modalNotes').value = user.notes || '';
+        document.getElementById('modalCustomPoster').value = user.customPoster || '';
+        renderModalStatusButtons(user.status);
+        renderModalStars(user.rating || 0);
+        populateModalMetadata(item);
+        if (needsFetch(id)) enqueueMetadataFetch(item, true);
+        document.getElementById('detailModal').classList.remove('hidden');
+        document.getElementById('btnCloseDetail').focus();
+      }
+
+      function closeDetailModal() {
+        state.activeModalId = null;
+        document.getElementById('detailModal').classList.add('hidden');
+        if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') { lastFocusedEl.focus(); lastFocusedEl = null; }
+      }
+
+      function populateModalMetadata(item) {
+        const user = getUserEntry(item.id);
+        const meta = metaCache[item.id] || {};
+        const curated = CURATED_META[item.id] || {};
+        const posterUrl = (user.customPoster && isValidHttpsUrl(user.customPoster))
+          ? user.customPoster : (meta.poster && isValidHttpsUrl(meta.poster) ? meta.poster : '');
+        const img = document.getElementById('modalPosterImg');
+        const fb = document.getElementById('modalPosterFallback');
+        img.alt = `${item.title} (${item.year}) poster`;
+        if (posterUrl) {
+          img.onload = () => { img.classList.remove('hidden'); fb.classList.add('hidden'); };
+          img.onerror = () => { img.classList.add('hidden'); fb.classList.remove('hidden'); };
+          img.src = posterUrl;
+        } else { img.classList.add('hidden'); fb.classList.remove('hidden'); }
+
+        fb.innerHTML = '';
+        const f1 = document.createElement('div'); f1.className = 'text-xs uppercase tracking-widest text-brass font-medium'; f1.textContent = `Rank #${item.rank}`;
+        const f2 = document.createElement('div'); f2.className = 'font-serif text-xl font-semibold text-ink my-auto'; f2.textContent = item.title;
+        const f3 = document.createElement('div'); f3.className = 'text-xs text-secondary'; f3.textContent = `${item.type === 'movie' ? 'Film' : 'Series'} · ${item.year}`;
+        fb.append(f1, f2, f3);
+
+        const subEl = document.getElementById('modalSubMeta');
+        subEl.innerHTML = '';
+        const parts = [String(item.year)];
+        if (curated.dir) parts.push('Directed by ' + curated.dir);
+        if (meta.runtime || curated.runtime) parts.push(meta.runtime || curated.runtime);
+        if (meta.network) parts.push(meta.network);
+        parts.forEach((p, idx) => {
+          if (idx > 0) { const dot = document.createElement('span'); dot.className = 'text-muted'; dot.textContent = '·'; subEl.appendChild(dot); }
+          const sp = document.createElement('span'); sp.textContent = p; subEl.appendChild(sp);
+        });
+
+        document.getElementById('modalDescription').textContent = meta.desc || curated.desc || (meta.failedAt ? 'No synopsis is currently available from external metadata providers.' : 'Retrieving synopsis from external metadata providers...');
+
+        const tagsEl = document.getElementById('modalExtraTags');
+        tagsEl.innerHTML = '';
+        const tags = [];
+        const g = meta.genre || curated.genre;
+        if (g) g.split(',').forEach(x => { if (x.trim()) tags.push(x.trim()); });
+        if (curated.country) tags.push(curated.country);
+        if (curated.lang) tags.push(curated.lang);
+        tags.forEach(t => {
+          const sp = document.createElement('span');
+          sp.className = 'px-2.5 py-0.5 rounded-sm bg-bg border border-line text-xs text-secondary';
+          sp.textContent = t;
+          tagsEl.appendChild(sp);
+        });
+        document.getElementById('modalWikiLink').href = isValidHttpsUrl(meta.wikiUrl) ? meta.wikiUrl : ('https://en.wikipedia.org/wiki/Special:Search?search=' + encodeURIComponent(item.title + ' ' + item.year));
+      }
+
+      function renderModalStatusButtons(activeStatus) {
+        document.querySelectorAll('#modalStatusBtns .status-opt').forEach(btn => {
+          const s = btn.getAttribute('data-status');
+          const active = s === activeStatus;
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+          btn.className = 'status-opt btn-base text-xs ' + (active
+            ? (s === 'watched' ? 'border-ok bg-ok/20 text-ink' : s === 'watching' ? 'border-brass bg-brass/20 text-ink' : 'border-secondary bg-elevated text-ink')
+            : 'text-secondary');
+        });
+      }
+
+      function renderModalStars(rating) {
+        const c = document.getElementById('modalStars');
+        document.getElementById('modalRatingText').textContent = rating ? `${rating} / 10` : 'Unrated';
+        c.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+          const b = document.createElement('button');
+          b.type = 'button'; b.setAttribute('data-star', String(i)); b.setAttribute('aria-label', `Rate ${i} out of 10`);
+          b.className = `w-8 h-8 rounded-sm text-xs font-medium border transition-colors cursor-pointer ${i <= rating ? 'bg-brass border-brass text-bg font-semibold' : 'bg-bg border-line text-secondary hover:border-brass hover:text-ink'}`;
+          b.textContent = String(i);
+          c.appendChild(b);
+        }
+        if (rating > 0) {
+          const clr = document.createElement('button');
+          clr.type = 'button'; clr.setAttribute('data-star', '0');
+          clr.className = 'ml-1 px-2.5 h-8 rounded-sm text-xs text-secondary hover:text-ink border border-line cursor-pointer';
+          clr.textContent = 'Clear';
+          c.appendChild(clr);
+        }
+      }
+
+      // Event Listeners
+      document.querySelectorAll('[data-nav]').forEach(btn => btn.addEventListener('click', () => switchView(btn.getAttribute('data-nav'))));
+      document.getElementById('btnBrandHome').addEventListener('click', () => switchView('collection'));
+      document.getElementById('btnInlineStats').addEventListener('click', () => switchView('stats'));
+      document.getElementById('btnMobileMenu').addEventListener('click', () => {
+        const nav = document.getElementById('mobileNav');
+        const hidden = nav.classList.toggle('hidden');
+        document.getElementById('btnMobileMenu').setAttribute('aria-expanded', hidden ? 'false' : 'true');
+      });
+
+      document.querySelectorAll('[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.mode = btn.getAttribute('data-mode');
+          document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+          renderCatalogue();
+        });
+      });
+
+      document.getElementById('btnToggleFilters').addEventListener('click', () => {
+        const hidden = document.getElementById('advancedFiltersPanel').classList.toggle('hidden');
+        document.getElementById('btnToggleFilters').setAttribute('aria-expanded', hidden ? 'false' : 'true');
+      });
+
+      const searchInput = document.getElementById('searchInput');
+      const btnClearSearch = document.getElementById('btnClearSearch');
+      searchInput.addEventListener('input', () => { state.search = searchInput.value; state.page = 1; btnClearSearch.classList.toggle('hidden', !state.search); renderCatalogue(); });
+      btnClearSearch.addEventListener('click', () => { searchInput.value = ''; state.search = ''; state.page = 1; btnClearSearch.classList.add('hidden'); renderCatalogue(); searchInput.focus(); });
+
+      document.getElementById('filterType').addEventListener('change', e => { state.type = e.target.value; state.page = 1; renderCatalogue(); });
+      document.getElementById('filterStatus').addEventListener('change', e => { state.status = e.target.value; state.page = 1; renderCatalogue(); });
+      document.getElementById('filterTier').addEventListener('change', e => { state.tier = e.target.value; state.page = 1; renderCatalogue(); });
+      document.getElementById('filterDecade').addEventListener('change', e => { state.decade = e.target.value; state.page = 1; renderCatalogue(); });
+      document.getElementById('sortBy').addEventListener('change', e => { state.sort = e.target.value; state.page = 1; renderCatalogue(); });
+
+      function resetAllFilters() {
+        state.type = state.view === 'movies' ? 'movie' : state.view === 'series' ? 'series' : 'all';
+        state.status = state.view === 'library' ? 'library-any' : 'all';
+        state.search = ''; state.tier = 'all'; state.decade = 'all'; state.sort = 'rank-asc'; state.page = 1;
+        searchInput.value = ''; btnClearSearch.classList.add('hidden');
+        syncFilterControls(); renderCatalogue();
+      }
+      document.getElementById('btnResetFilters').addEventListener('click', resetAllFilters);
+      document.getElementById('btnEmptyReset').addEventListener('click', resetAllFilters);
+
+      document.getElementById('btnPrevPage').addEventListener('click', () => { if (state.page > 1) { state.page--; renderCatalogue(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+      document.getElementById('btnNextPage').addEventListener('click', () => { state.page++; renderCatalogue(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+      document.getElementById('btnRandomPick').addEventListener('click', () => {
+        const pool = getFilteredItems().filter(i => getUserEntry(i.id).status !== 'watched');
+        if (!pool.length) { showToast('No unwatched titles match your current filters.'); return; }
+        openDetailModal(pool[Math.floor(Math.random() * pool.length)].id);
+      });
+
+      document.getElementById('btnCloseDetail').addEventListener('click', closeDetailModal);
+      document.getElementById('detailModal').addEventListener('click', e => { if (e.target === document.getElementById('detailModal')) closeDetailModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.getElementById('detailModal').classList.contains('hidden')) closeDetailModal(); });
+
+      document.getElementById('modalStatusBtns').addEventListener('click', e => {
+        const btn = e.target.closest('.status-opt');
+        if (!btn || !state.activeModalId) return;
+        const status = btn.getAttribute('data-status');
+        setUserEntry(state.activeModalId, { status });
+        renderModalStatusButtons(status);
+        renderCatalogue();
+      });
+      document.getElementById('modalStars').addEventListener('click', e => {
+        const btn = e.target.closest('[data-star]');
+        if (!btn || !state.activeModalId) return;
+        const rating = parseInt(btn.getAttribute('data-star'), 10);
+        setUserEntry(state.activeModalId, { rating });
+        renderModalStars(rating);
+        renderCatalogue();
+      });
+      document.getElementById('modalNotes').addEventListener('input', e => { if (state.activeModalId) setUserEntry(state.activeModalId, { notes: e.target.value.slice(0, MAX_NOTE_LENGTH) }); });
+      document.getElementById('btnSaveCustomPoster').addEventListener('click', () => {
+        if (!state.activeModalId) return;
+        const url = document.getElementById('modalCustomPoster').value.trim();
+        if (url && !isValidHttpsUrl(url)) { showToast('Please enter a valid HTTPS image URL.'); return; }
+        setUserEntry(state.activeModalId, { customPoster: url });
+        populateModalMetadata(ITEM_MAP.get(state.activeModalId));
+        updateAllPosterInstances(state.activeModalId);
+        showToast(url ? 'Custom poster applied.' : 'Custom poster cleared.');
+      });
+      document.getElementById('btnRefreshPoster').addEventListener('click', () => {
+        if (!state.activeModalId) return;
+        const item = ITEM_MAP.get(state.activeModalId);
+        delete metaCache[item.id]; inFlight.delete(item.id);
+        enqueueMetadataFetch(item, true);
+        showToast('Refreshing external metadata.');
+      });
+
+      function safeCsvCell(val) {
+        let str = String(val ?? '');
+        if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+
+      document.getElementById('btnExportJson').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(userState, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'muvanta-watchlist-backup.json'; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        showToast('JSON backup exported.');
+      });
+      document.getElementById('btnExportCsv').addEventListener('click', () => {
+        const rows = [['Type', 'Rank', 'Title', 'Year', 'Status', 'Rating', 'Notes', 'CustomPoster']];
+        ALL_ITEMS.forEach(item => {
+          const u = getUserEntry(item.id);
+          if (u.status !== 'unwatched' || u.rating || u.notes || u.customPoster) rows.push([item.type, item.rank, item.title, item.year, u.status, u.rating || '', u.notes || '', u.customPoster || '']);
+        });
+        const csv = rows.map(r => r.map(safeCsvCell).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'muvanta-watchlist.csv'; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        showToast('CSV exported.');
+      });
+      document.getElementById('inputImportJson').addEventListener('change', e => {
+        const file = e.target.files[0]; e.target.value = '';
+        if (!file) return;
+        if (file.size > MAX_IMPORT_BYTES) { showToast('Backup file exceeds 5 MB limit.'); return; }
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const { clean, validCount, skippedCount } = sanitizeUserState(JSON.parse(ev.target.result));
+            if (!clean || !validCount) { showToast('No valid records found in JSON file.'); return; }
+            pendingImportData = clean;
+            document.getElementById('importPreviewText').textContent = `Validated ${validCount} record${validCount === 1 ? '' : 's'}${skippedCount ? ` (${skippedCount} skipped)` : ''}. Select Merge or Replace:`;
+            document.getElementById('importPreviewBox').classList.remove('hidden');
+          } catch { showToast('Invalid JSON file. Existing progress unchanged.'); }
+        };
+        reader.readAsText(file);
+      });
+      function applyImport(mode) {
+        if (!pendingImportData) return;
+        previousUserStateSnapshot = JSON.parse(JSON.stringify(userState));
+        userState = mode === 'replace' ? pendingImportData : { ...userState, ...pendingImportData };
+        pendingImportData = null;
+        document.getElementById('importPreviewBox').classList.add('hidden');
+        document.getElementById('btnUndoImport').classList.remove('hidden');
+        saveUserState(); updateProgressUI(); renderCatalogue();
+        showToast(mode === 'replace' ? 'Backup replaced existing progress.' : 'Backup merged with existing progress.');
+      }
+      document.getElementById('btnImportMerge').addEventListener('click', () => applyImport('merge'));
+      document.getElementById('btnImportReplace').addEventListener('click', () => applyImport('replace'));
+      document.getElementById('btnImportCancel').addEventListener('click', () => { pendingImportData = null; document.getElementById('importPreviewBox').classList.add('hidden'); });
+      document.getElementById('btnUndoImport').addEventListener('click', () => {
+        if (!previousUserStateSnapshot) return;
+        userState = previousUserStateSnapshot; previousUserStateSnapshot = null;
+        document.getElementById('btnUndoImport').classList.add('hidden');
+        saveUserState(); updateProgressUI(); renderCatalogue();
+        showToast('Previous state restored.');
+      });
+      document.getElementById('btnResetProgress').addEventListener('click', () => {
+        const btn = document.getElementById('btnResetProgress');
+        if (!state.confirmResetPending) { state.confirmResetPending = true; btn.textContent = 'Click Again to Confirm Clear'; return; }
+        previousUserStateSnapshot = JSON.parse(JSON.stringify(userState));
+        userState = {}; saveUserState(); updateProgressUI(); renderCatalogue();
+        state.confirmResetPending = false; btn.textContent = 'Clear All Progress';
+        document.getElementById('btnUndoImport').classList.remove('hidden');
+        showToast('All local progress cleared.');
+      });
+
+      // Init
+      loadStorage();
+      updateProgressUI();
+      renderFilmstrip();
+      renderCatalogue();
+    })();
+  </script>
+</body>
+</html>
